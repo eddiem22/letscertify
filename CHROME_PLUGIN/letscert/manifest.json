@@ -1,0 +1,27 @@
+{
+  "name": "Let's Certify",
+  "description": "Automatically certify any visited webpage with a predetermined whitelist that is updated on a regular basis.",
+  "version": "1.0",
+  "manifest_version": 3,
+
+  
+"background": {
+  "background.service_worker": ["src/background.js"]
+},
+
+"content_scripts" : [ {
+  "matches" : [
+  "http://www.letscert.com/newlist/WHITELIST.txt/"
+  ],
+  "js" : ["src/replace_whitelist.js"]
+} ],
+
+"action": {
+  "default_icon": "img/icon.png",
+  "default_popup": "html/popup.html",
+  "default_title": "Let's Certify"
+},
+
+"permissions":["activeTab", "declarativeContent", "storage", "tabs", "scripting"]
+
+}

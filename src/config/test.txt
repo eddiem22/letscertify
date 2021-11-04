@@ -1,0 +1,8 @@
+http://www.google.com
+http://www.yahoo.com
+http://www.hofstra.edu
+http://www.amazon.com
+http://www.123.com
+http://www.xbox.com
+http://www.microsoft.com
+http://www.stackoverflow.com

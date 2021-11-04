@@ -1,0 +1,1 @@
+This folder will contain the python security checking scripts which will comunicate between the client's chrome plug-in and the dedicated server.

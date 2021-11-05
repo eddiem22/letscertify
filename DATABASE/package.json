@@ -1,1 +1,0 @@
-{"name":"letscertify","version":"1.0.0","description":"handles requests from user plugin and provides database","main":"main.js","author":"Eddie Marcencov","dependencies":{"express":"^4.17.1","fs":"^0.0.1-security","sequelize":"^6.8.0","sqlite3":"^5.0.2"}}

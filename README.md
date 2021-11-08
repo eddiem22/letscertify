@@ -8,7 +8,7 @@ will be available for the client, which will be able to converse with a remote s
 readily available database, in addition to hosting a website that would provide a regularly updated whitelist.
 For websites not available in the whitelist, the provided security scripts would then test several
 website vulnerabilities, including XSS injection. By passing a test, the boolean flag of a website's security 
-check would be set to True, and false, vice versa. While a website included in the pregiven whitelist
+check would be set to True, or false otherwise. Then, it would also be provided a private key through the RSA accumulator. While a website included in the pregiven whitelist
 would automatically have its boolean flag set to true, its "From Whitelist" flag would also be set to true as well.
 This is done to ensure the user that although the website passed the tests, there is still the posibility
 that the website may incorporate a relatively newer method of a malicious attack, or one that we simply may

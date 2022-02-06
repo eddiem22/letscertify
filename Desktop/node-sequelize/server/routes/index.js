@@ -10,15 +10,21 @@ module.exports = app => {
       })
     })
   
-    app.get("/api/websites", websiteController.getAllWebsites)
+    app.get("/api/website", websiteController.getAllWebsites)
   
     app.post("/api/website/create", websiteController.createWebsite)
+
+    app.get("/api/website/:URL", websiteController.getWebsite)
   
-    app.put("/api/website/:url", websiteController.updateWebsite)
+    app.put("/api/website/:URL", websiteController.updateWebsite)
   
-    app.get("/api/:categoryId/websites", websiteController.getAllWebsitesOfCategory)
+    app.get("/api/website/category/:categoryID", websiteController.getAllWebsitesOfCategory)
     
+    app.get("/api/website/securityFlag/:securityFlag", websiteController.getAllWebsitesOfSecurityFlag)
+
     app.post("/api/category/create", categoryController.createCategory)
 
-    app.put("/api/:categoryID", categoryController.updateCategory)
+    app.get("/api/category", categoryController.getAllCategories)
+
+    app.put("/api/category/:categoryID", categoryController.updateCategory)
   }

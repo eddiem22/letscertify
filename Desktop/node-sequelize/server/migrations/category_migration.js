@@ -9,6 +9,7 @@ up: (queryInterface, Sequelize) =>
         autoIncrement: true,
         allowNull: false,
     },
+
     Name: {
         type:Sequelize.STRING,
         allowNull: false,

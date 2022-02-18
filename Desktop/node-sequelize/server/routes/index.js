@@ -13,8 +13,6 @@ module.exports = app => {
     app.get("/api/website", websiteController.getAllWebsites)
   
     app.post("/api/website/create", websiteController.createWebsite)
-
-    app.get("/api/website/:URL", websiteController.getWebsite)
   
     app.put("/api/website/update/:URL", websiteController.updateWebsite)
   

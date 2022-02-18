@@ -3,10 +3,10 @@ const Category = require("../models").Category
 
 module.exports = {
       async getAllWebsites(req, res) {
+        let Websites = await Website.findAll();
         try {
-          let Websites = await Website.findAll();
-    
-          res.status(201).send(Websites)
+          if(req.body.fetchAll) {res.status(201).send(Websites)}
+          else{let singleWebsite = await Website.findOne({where:{URL:req.body.URL}}); res.status(201).send(singleWebsite)}
         } catch (e) {
           console.log(e)
     
@@ -15,39 +15,58 @@ module.exports = {
       },
 
         async getWebsite(req, res) {
-          try {
-            let thisWebsite = await Website.findOne(
+          try 
+          {
+            Website.sync().then(function() {
+            let thisWebsite = Website.findOne(
               {
-                where:{URL: req.params.URL}
+                where:{URL: req.params.URL,
+                //include: [Website],
+                //limit: 1
+                }
               })
+
               if(thisWebsite)
               {
+                /*
+                let found = await Website.findOne(
+                  {
+                    where:{URL: thisWebsite.URL,
+                      id: thisWebsite.id,
+                      categoryID: thisWebsite.categoryID ? thisWebsite.categoryID : 1,
+                      securityFlag: thisWebsite.securityFlag,
+                    include: [Website],
+                    limit: 1
+                    }
+                  })
+                  */
                 console.log(thisWebsite)
                 res.status(201).send(thisWebsite)
               }
               else {res.status(404).send("Website Not Found")}
+            })
           } catch (e) {
             console.log(e)
             res.status(500).send(e)
           }
-        },
+        
+          },
 
       async getAllWebsitesOfCategory(req, res) {
         try {
           Website.sync().then(function() {
-          let thisCategory = Category.findOne({
+          let thisCategory = Website.findAll({
             where:{categoryID: req.params.categoryID},
           })
 
           if(thisCategory) {
             let websites = Website.findAll({
-              where:{categoryID: req.params.categoryID},
-              include : [Website],
-              limit: 1
+              where:{categoryID: req.params.categoryID}
             })
 
           res.status(201).send(websites)
         }
+        else{res.status(500).send("CANNOT FIND WEBSITE")}
        })
       }
         catch (e) {

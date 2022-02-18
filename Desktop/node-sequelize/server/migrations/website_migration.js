@@ -18,7 +18,11 @@ module.exports = {
             allowNull: true,
             defaultValue: 1
         },
-
+        categoryID: {
+            type: Sequelize.INTEGER,
+            defaultValue: 1,
+            allowNull: true,
+        },
         createdAt: {
             allowNull: false,
             type: Sequelize.DATE,
@@ -28,6 +32,6 @@ module.exports = {
             type: Sequelize.DATE,
             },
     }),
-  down: (queryInterface /* , Sequelize */) => queryInterface.dropTable("Websites"),
+  //down: (queryInterface /* , Sequelize */) => queryInterface.dropTable("Websites"),
 }     
  

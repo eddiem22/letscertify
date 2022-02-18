@@ -16,7 +16,7 @@ module.exports = app => {
 
     app.get("/api/website/:URL", websiteController.getWebsite)
   
-    app.put("/api/website/:URL", websiteController.updateWebsite)
+    app.put("/api/website/update/:URL", websiteController.updateWebsite)
   
     app.get("/api/website/category/:categoryID", websiteController.getAllWebsitesOfCategory)
     

@@ -17,44 +17,6 @@ module.exports = {
         }
       },
 
-        async getWebsite(req, res) {
-          try 
-          {
-            Website.sync().then(function() {
-            let thisWebsite = Website.findOne(
-              {
-                where:{URL: req.params.URL,
-                //include: [Website],
-                //limit: 1
-                }
-              })
-
-              if(thisWebsite)
-              {
-                /*
-                let found = await Website.findOne(
-                  {
-                    where:{URL: thisWebsite.URL,
-                      id: thisWebsite.id,
-                      categoryID: thisWebsite.categoryID ? thisWebsite.categoryID : 1,
-                      securityFlag: thisWebsite.securityFlag,
-                    include: [Website],
-                    limit: 1
-                    }
-                  })
-                  */
-                console.log(thisWebsite)
-                res.status(201).send(thisWebsite)
-              }
-              else {res.status(404).send("Website Not Found")}
-            })
-          } catch (e) {
-            console.log(e)
-            res.status(500).send(e)
-          }
-        
-          },
-
       async getAllWebsitesOfCategory(req, res) {
         try {
           Website.sync().then(function() {

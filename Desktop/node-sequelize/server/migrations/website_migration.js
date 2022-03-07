@@ -31,7 +31,11 @@ module.exports = {
              allowNull: false,
             type: Sequelize.DATE,
             },
+        RSA_Key:{
+            allowNull: true,
+            type: Sequelize.INTEGER
+        },
     }),
-  //down: (queryInterface /* , Sequelize */) => queryInterface.dropTable("Websites"),
+  down: (queryInterface /* , Sequelize */) => queryInterface.dropTable("Websites"),
 }     
  

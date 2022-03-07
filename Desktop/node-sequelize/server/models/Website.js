@@ -26,6 +26,10 @@ let Website = sequelize.define('Website', {
         defaultValue: 1,
         allowNull: false,
     },
+    RSA_Key:{
+        allowNull: true,
+        type: DataTypes.INTEGER
+    }
 });
 
 Website.associate = function(models) {

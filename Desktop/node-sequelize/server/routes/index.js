@@ -14,7 +14,9 @@ module.exports = app => {
   
     app.post("/api/website/create", websiteController.createWebsite)
   
-    app.put("/api/website/update/:URL", websiteController.updateWebsite)
+    app.put("/api/website/update", websiteController.updateWebsite)
+
+    app.delete("/api/website/delete", websiteController.deleteWebsite)
   
     app.get("/api/website/category/:categoryID", websiteController.getAllWebsitesOfCategory)
     

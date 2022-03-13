@@ -73,7 +73,8 @@ module.exports = {
             Website.findOrCreate({where:{
             URL: req.body.URL,
             securityFlag: req.body.securityFlag ? req.body.securityFlag: 1,
-            categoryID: Category.findOrCreate({where:{id:req.body.categoryID ? req.body.categoryID: 1}}) ? req.body.categoryID: 1 
+            categoryID: req.body.categoryID ? req.body.categoryID: 1,
+            RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null
           }}).then(function(result) {
             var thisWebsite = result[0],
             created = result[1];
@@ -96,14 +97,18 @@ module.exports = {
       async updateWebsite(req, res) {
         try {
           let website = await Website.findOne({
-           where:{URL: req.params.URL}
+           where:{URL: req.body.URL}
           })
     
           if (website) {
-            let updatedWebsite = await User.update(
-              {
-                  securityFlag: req.params.securityFlag,
-                  categoryID: req.params.categoryID
+            let updatedWebsite = await Website.update({
+             
+                  securityFlag: req.body.securityFlag,
+                  categoryID: req.body.categoryID ? req.body.categoryID : 1,
+                  RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null
+                },
+                {
+                where: {URL: req.body.URL}
                 }
             )
     
@@ -117,4 +122,30 @@ module.exports = {
           res.status(500).send(e)
         }
       },
+    
+
+
+
+    async deleteWebsite(req, res) {
+      try {
+          let websiteForDeletion = await Website.findOne({where:{
+           
+                URL: req.body.URL,
+                securityFlag: req.body.securityFlag,
+                categoryID: req.body.categoryID ? req.body.categoryID : 1,
+                RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null
+              }}
+          )
+          if(websiteForDeletion) {await websiteForDeletion.destroy()
+  
+          res.status(201).send('Website Deleted!')}
+         else {
+          res.status(404).send("Website Not Found")
+        }
+      } catch (e) {
+        console.log(e)
+  
+        res.status(500).send(e)
+      }
     }
+  }

@@ -18,9 +18,9 @@ module.exports = app => {
 
     app.delete("/api/website/delete", websiteController.deleteWebsite)
   
-    app.get("/api/website/category/:categoryID", websiteController.getAllWebsitesOfCategory)
+    //app.get("/api/website/category", websiteController.getAllWebsitesOfCategory)
     
-    app.get("/api/website/securityFlag", websiteController.getAllWebsitesOfSecurityFlag)
+    //app.get("/api/website/securityFlag", websiteController.getAllWebsitesOfSecurityFlag)
 
     app.post("/api/category/create", categoryController.createCategory)
 

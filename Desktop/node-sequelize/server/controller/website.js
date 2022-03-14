@@ -6,9 +6,9 @@ module.exports = {
         let Websites = await Website.findAll({where:{securityFlag: req.body.securityFlag ? req.body.securityFlag : !null, categoryID: req.body.categoryID ? req.body.categoryID : 1}})
         try {
           if(req.body.fetchAll) {res.status(201).send(Websites)}
-          else{let singleWebsite = await Website.findOne({where:{URL:req.body.URL,}}); 
+          else{if(!req.body.URL){res.status(404).send("URL Not Found")} else {let singleWebsite = await Website.findOne({where:{URL:req.body.URL,}}); 
           if(singleWebsite){res.status(201).send(singleWebsite)}
-          else{res.status(404).send("Website Not Found")}
+          else{res.status(404).send("Website Not Found")}}
         }// end of else for fetchAll specifier check 
         } catch (e) {
           console.log(e)

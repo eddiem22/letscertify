@@ -20,7 +20,7 @@ module.exports = app => {
   
     app.get("/api/website/category/:categoryID", websiteController.getAllWebsitesOfCategory)
     
-    app.get("/api/website/securityFlag/:securityFlag", websiteController.getAllWebsitesOfSecurityFlag)
+    app.get("/api/website/securityFlag", websiteController.getAllWebsitesOfSecurityFlag)
 
     app.post("/api/category/create", categoryController.createCategory)
 

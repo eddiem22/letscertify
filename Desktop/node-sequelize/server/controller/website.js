@@ -45,12 +45,12 @@ module.exports = {
         try {
           Website.sync().then(function() {
           let matchedSecurityFlag =  Website.findOne({
-            where:{securityFlag: req.params.securityFlag},
+            where:{securityFlag: req.body.securityFlag},
           })
           if (matchedSecurityFlag) {
-            let websites = User.findAll({
+            let websites = Website.findAll({
                 where:{
-                  securityFlag: req.params.securityFlag
+                  securityFlag: req.body.securityFlag
                 },
             })
     

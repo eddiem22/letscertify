@@ -6,7 +6,7 @@ module.exports = {
         let Websites = await Website.findAll({where:{securityFlag: req.body.securityFlag ? req.body.securityFlag : !null, categoryID: req.body.categoryID ? req.body.categoryID : 1}})
         try {
           if(req.body.fetchAll) {res.status(201).send(Websites)}
-          else{if(!req.body.URL){res.status(404).send("URL Not Found")} else {let singleWebsite = await Website.findOne({where:{URL:req.body.URL,}}); 
+          else{if(!req.body.URL){res.status(404).send("Please Enter URL")} else {let singleWebsite = await Website.findOne({where:{URL:req.body.URL,}}); 
           if(singleWebsite){res.status(201).send(singleWebsite)}
           else{res.status(404).send("Website Not Found")}}
         }// end of else for fetchAll specifier check 
@@ -105,7 +105,7 @@ module.exports = {
           if (website) {
             let updatedWebsite = await Website.update({
              
-                  securityFlag: req.body.securityFlag,
+                  securityFlag: req.body.securityFlag ? req.body.securityFlag : 1,
                   categoryID: req.body.categoryID ? req.body.categoryID : 1,
                   RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null
                 },
@@ -113,8 +113,10 @@ module.exports = {
                 where: {URL: req.body.URL}
                 }
             )
+            let website = await Website.findOne({
+              where:{URL: req.body.URL}})
     
-            res.status(201).send(updatedWebsite)
+            res.status(201).send(website)
           } else {
             res.status(404).send("Website Not Found")
           }
@@ -133,7 +135,7 @@ module.exports = {
           let websiteForDeletion = await Website.findOne({where:{
            
                 URL: req.body.URL,
-                securityFlag: req.body.securityFlag,
+                securityFlag: req.body.securityFlag ? req.body.securityFlag : 1 ,
                 categoryID: req.body.categoryID ? req.body.categoryID : 1,
                 RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null
               }}

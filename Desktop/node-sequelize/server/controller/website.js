@@ -3,10 +3,10 @@ const Category = require("../models").Category
 
 module.exports = {
       async getAllWebsites(req, res) {
-        let Websites = await Website.findAll({where:{securityFlag: req.body.securityFlag ? req.body.securityFlag : !null, categoryID: req.body.categoryID ? req.body.categoryID : 1}})
+        let Websites = await Website.findAll({where:{securityFlag: req.body.securityFlag ? req.body.securityFlag : 1, categoryID: req.body.categoryID ? req.body.categoryID : 1}})
         try {
-          if(req.body.fetchAll) {res.status(201).send(Websites)}
-          else{if(!req.body.URL){res.status(404).send("Please Enter URL")} else {let singleWebsite = await Website.findOne({where:{URL:req.body.URL,}}); 
+          if(req.query.fetchAll) {res.status(201).send(Websites)}
+          else{if(!req.query.URL){res.status(404).send("Please Enter URL")} else {let singleWebsite = await Website.findOne({where:{URL:req.query.URL,}}); 
           if(singleWebsite){res.status(201).send(singleWebsite)}
           else{res.status(404).send("Website Not Found")}}
         }// end of else for fetchAll specifier check 
@@ -23,7 +23,7 @@ module.exports = {
         try {
           Website.sync().then(function() {
           let thisCategory = Website.findAll({
-            where:{categoryID: req.body.categoryID},
+            where:{categoryID: req.query.categoryID},
           })
 
           if(thisCategory) {

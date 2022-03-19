@@ -2,6 +2,10 @@ const Website = require("../models").Website;
 const Category = require("../models").Category;
 const getHashes = require("../utils").makeHashList;
 var cron = require('node-cron');
+const spawn = require("child_process").spawn;
+const path = require('path');
+const fs = require('fs');
+
 
 //ONCE A DAY SCRIPT
 cron.schedule('0 0 * * *', () => {
@@ -14,7 +18,7 @@ module.exports = {
   
   //GET ONE WEBSITE OR ALL OF TYPE
       async getAllWebsites(req, res) {
-        let Websites = await Website.findAll({where:{securityFlag: req.query.securityFlag ? req.query.securityFlag : 1, categoryID: req.query.categoryID ? req.query.categoryID : 1}})
+        let Websites = await Website.findAll({where:{securityFlag: req.query.securityFlag ? req.query.securityFlag : 1, categoryID: req.query.categoryID ? req.query.categoryID : 1, Hash: req.body.Hash ? req.body.Hash : null}})
         try {
           if(req.query.fetchAll) {res.status(201).send(Websites)}
           else{if(!req.query.URL){res.status(404).send("Please Enter URL")} else {let singleWebsite = await Website.findOne({where:{URL:req.query.URL}}); 
@@ -88,7 +92,8 @@ module.exports = {
             URL: req.body.URL,
             securityFlag: req.body.securityFlag ? req.body.securityFlag: 1,
             categoryID: req.body.categoryID ? req.body.categoryID: 1,
-            RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null
+            RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null,
+            Hash: req.body.Hash ? req.body.Hash : null
           }}).then(function(result) {
             var thisWebsite = result[0],
             created = result[1];
@@ -122,7 +127,8 @@ module.exports = {
              
                   securityFlag: req.body.securityFlag ? req.body.securityFlag : 1,
                   categoryID: req.body.categoryID ? req.body.categoryID : 1,
-                  RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null
+                  RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null,
+                  Hash: req.body.Hash ? req.body.Hash : null
                 },
                 {
                 where: {URL: req.body.URL}
@@ -177,7 +183,7 @@ module.exports = {
         {
           try {
             let website = await Website.findOne({
-             where:{Hashes: null}
+             where:{Hash: null}
             })
       
             if (website) {
@@ -201,7 +207,7 @@ module.exports = {
     async updateSingleHash(oldHash, websiteHash) {
       try {
         let website = await Website.findOne({
-         where:{Hashes: websiteHash}
+         where:{Hash: websiteHash}
         })
   
         if (website) {
@@ -209,7 +215,7 @@ module.exports = {
               Hash: websiteHash
               },
               {
-              where: {Hash: oldHash }
+              where: {Hash: oldHash}
               }
           )
     }
@@ -220,10 +226,31 @@ module.exports = {
 
 
 //GET RSA KEY
-  async getKey(){
+  async getKey(websiteHash){
+    try {
+      let website = await Website.findOne({
+       where:{Hash: websiteHash}
+      })
 
-  },
+      if (website) {
+      if(website.RSA_Key) {return website.RSA_Key}
+      else{return null}
+  }
+  else{return null}
+}
+catch(e) {console.log(e)}
+},
   //GET RSA KEY
+
+  //SEND KEY TO ACCUMULATOR SCRIPT
+  async fromWhitelist(Key) {
+     const python = spawn('python3', [path.join(__dirname, '../Accumulator.py'), Key]);
+     python.stdout.on('data', function(data) {
+      return data.toString();
+  } )
+  },
+  //SEND KEY TO ACCUMULATOR SCRIPT
+
 
     
     

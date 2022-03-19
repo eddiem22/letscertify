@@ -1,7 +1,18 @@
-const Website = require("../models").Website
-const Category = require("../models").Category
+const Website = require("../models").Website;
+const Category = require("../models").Category;
+const getHashes = require("../utils").makeHashList;
+var cron = require('node-cron');
+
+//ONCE A DAY SCRIPT
+cron.schedule('0 0 * * *', () => {
+  this.fillHashes()
+});
+//ONCE A DAY SCRIPT
+
 
 module.exports = {
+  
+  //GET ONE WEBSITE OR ALL OF TYPE
       async getAllWebsites(req, res) {
         let Websites = await Website.findAll({where:{securityFlag: req.query.securityFlag ? req.query.securityFlag : 1, categoryID: req.query.categoryID ? req.query.categoryID : 1}})
         try {
@@ -16,7 +27,7 @@ module.exports = {
           res.status(500).send(e)
         }
       },
-
+//GET ONE WEBSITE OR ALL OF TYPE
 
       /*
       async getAllWebsitesOfCategory(req, res) {
@@ -68,7 +79,8 @@ module.exports = {
         }
       },
       */
-    
+
+  //CREATE WEBSITE
       async createWebsite(req, res) {
         try {
           Website.sync().then(function() {
@@ -95,7 +107,10 @@ module.exports = {
           res.status(400).send(e)
         }
       },
+//CREATE WEBSITE
     
+
+//UPDATE WEBSITE
       async updateWebsite(req, res) {
         try {
           let website = await Website.findOne({
@@ -103,7 +118,7 @@ module.exports = {
           })
     
           if (website) {
-            let updatedWebsite = await Website.update({
+            await Website.update({
              
                   securityFlag: req.body.securityFlag ? req.body.securityFlag : 1,
                   categoryID: req.body.categoryID ? req.body.categoryID : 1,
@@ -126,10 +141,10 @@ module.exports = {
           res.status(500).send(e)
         }
       },
-    
+//UPDATE WEBSITE 
 
 
-
+//DELETE WEBSITE
     async deleteWebsite(req, res) {
       try {
           let websiteForDeletion = await Website.findOne({where:{
@@ -151,5 +166,72 @@ module.exports = {
   
         res.status(500).send(e)
       }
+    },
+//DELETE WEBSITE
+
+
+//FILL HASHES IF NULL
+    async fillHashes(){
+        let Hashes = getHashes()
+        for(i in Hashes)
+        {
+          try {
+            let website = await Website.findOne({
+             where:{Hashes: null}
+            })
+      
+            if (website) {
+              await Website.update({
+                  Hash: Hashes[i]
+                  },
+                  {
+                  where: {Hash: Hashes[i]}
+                  }
+              )
+        }
+        else{continue}
+      }
+      catch(e) {console.log(e)}
+    }
+    },
+//FILL HASHES IF NULL
+
+
+//UPDATE SINGLE HASH
+    async updateSingleHash(oldHash, websiteHash) {
+      try {
+        let website = await Website.findOne({
+         where:{Hashes: websiteHash}
+        })
+  
+        if (website) {
+          await Website.update({
+              Hash: websiteHash
+              },
+              {
+              where: {Hash: oldHash }
+              }
+          )
     }
   }
+  catch(e) {console.log(e)}
+  },
+//UPDATE SINGLE HASH
+
+
+//GET RSA KEY
+  async getKey(){
+
+  },
+  //GET RSA KEY
+
+    
+    
+
+
+
+
+
+
+  }
+

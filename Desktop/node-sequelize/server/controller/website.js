@@ -18,12 +18,38 @@ module.exports = {
   
   //GET ONE WEBSITE OR ALL OF TYPE
       async getAllWebsites(req, res) {
+
+        //IF ONLY HASH
+        if(!req.query.fetchAll && !req.query.URL && !req.query.securityFlag && !req.query.categoryID && !req.query.RSA_Key && req.query.Hash) {
+          let websiteInWhitelist = await Website.findOne({where:{Hash: req.query.Hash}})
+          if(websiteInWhitelist){getKey(Hash)}
+          res.status(201).send('Now Validating Website...')
+        }
+        //IF ONLY HASH
+
+        //IF NOT ONLY HASH
         let Websites = await Website.findAll({where:{securityFlag: req.query.securityFlag ? req.query.securityFlag : 1, categoryID: req.query.categoryID ? req.query.categoryID : 1, Hash: req.body.Hash ? req.body.Hash : null}})
         try {
+
+          //IF FETCHALL
           if(req.query.fetchAll) {res.status(201).send(Websites)}
-          else{if(!req.query.URL){res.status(404).send("Please Enter URL")} else {let singleWebsite = await Website.findOne({where:{URL:req.query.URL}}); 
+          //IF FETCHALL
+
+          //else for fetchAll specifier check
+          else{
+
+          //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL
+          if(!req.query.URL){res.status(404).send("Please Enter URL")} else {let singleWebsite = await Website.findOne({where:{URL:req.query.URL}}); 
+          //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL
+
+          //IF SINGLE WEBSITE FOUND
           if(singleWebsite){res.status(201).send(singleWebsite)}
+          //IF SINGLE WEBSITE FOUND
+
+          //IF NO SINGLE WEBSITE FOUND
           else{res.status(404).send("Website Not Found")}}
+          //IF SINGLE WEBSITE FOUND
+
         }// end of else for fetchAll specifier check 
         } catch (e) {
           console.log(e)
@@ -32,57 +58,6 @@ module.exports = {
         }
       },
 //GET ONE WEBSITE OR ALL OF TYPE
-
-      /*
-      async getAllWebsitesOfCategory(req, res) {
-        try {
-          Website.sync().then(function() {
-          let thisCategory = Website.findAll({
-            where:{categoryID: req.query.categoryID},
-          })
-
-          if(thisCategory) {
-            let websites = Website.findAll({
-              where:{categoryID: req.query.categoryID}
-            })
-
-          res.status(201).send(websites)
-        }
-        else{res.status(500).send("CANNOT FIND WEBSITE")}
-       })
-      }
-        catch (e) {
-          console.log(e)
-    
-          res.status(500).send(e)
-        }
-      },
-      */
-
-/*
-      async getAllWebsitesOfSecurityFlag(req, res) {
-        try {
-          let matchedSecurityFlag =  Website.findAll({
-            where:{securityFlag: req.body.securityFlag},
-          })
-          if (matchedSecurityFlag) {
-            let websites = Website.findAll({
-                where:{
-                  securityFlag: req.body.securityFlag
-                },
-            })
-            res.status(201).send(websites)
-          } else {
-            res.status(404).send("Security flag Not Found")
-          }
-        
-        } catch (e) {
-          console.log(e)
-    
-          res.status(500).send(e)
-        }
-      },
-      */
 
   //CREATE WEBSITE
       async createWebsite(req, res) {

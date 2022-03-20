@@ -5,7 +5,7 @@ var cron = require('node-cron');
 const spawn = require("child_process").spawn;
 const path = require('path');
 const fs = require('fs');
-
+const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
 
 //ONCE A DAY SCRIPT
 cron.schedule('0 0 * * *', () => {
@@ -19,13 +19,13 @@ module.exports = {
   //GET ONE WEBSITE OR ALL OF TYPE
       async getAllWebsites(req, res) {
 
-        //IF ONLY HASH
+        //IF ONLY HASH, VALIDATE RSA KEY
         if(!req.query.fetchAll && !req.query.URL && !req.query.securityFlag && !req.query.categoryID && !req.query.RSA_Key && req.query.Hash) {
           let websiteInWhitelist = await Website.findOne({where:{Hash: req.query.Hash}})
           if(websiteInWhitelist){getKey(Hash)}
           res.status(201).send('Now Validating Website...')
         }
-        //IF ONLY HASH
+        //IF ONLY HASH, VALIDATE RSA KEY
 
         //IF NOT ONLY HASH
         let Websites = await Website.findAll({where:{securityFlag: req.query.securityFlag ? req.query.securityFlag : 1, categoryID: req.query.categoryID ? req.query.categoryID : 1, Hash: req.body.Hash ? req.body.Hash : null}})
@@ -217,9 +217,10 @@ catch(e) {console.log(e)}
 },
   //GET RSA KEY
 
+
   //SEND KEY TO ACCUMULATOR SCRIPT
   async fromWhitelist(Key) {
-     const python = spawn('python3', [path.join(__dirname, '../Accumulator.py'), Key]);
+     const python = spawn('python3', [ACCUMULATOR, Key]);
      python.stdout.on('data', function(data) {
       return data.toString();
   } )

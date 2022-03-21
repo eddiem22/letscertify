@@ -1,15 +1,14 @@
-const crypto = require('crypto');
+var forge = require('node-forge');
 
-
-modules.export = {
-    async hash(string) {
-        const utf8 = new TextEncoder().encode(string);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray
-          .map((bytes) => bytes.toString(16).padStart(2, '0'))
-          .join('');
-        return hashHex;
-      }
-      
+module.exports = {
+     async hasher(data) {
+      let createdHash = new Promise(function(resolve) {
+      var md = forge.md.sha256.create();
+      md.update(data)
+      resolve(md.digest().toHex());
+      });
+      let hash = await createdHash;
+      return hash;
 }
+}
+

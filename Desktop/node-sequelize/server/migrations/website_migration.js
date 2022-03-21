@@ -33,8 +33,16 @@ module.exports = {
             },
         RSA_Key:{
             allowNull: true,
-            type: Sequelize.INTEGER
+            type: Sequelize.STRING
         },
+        Hash:{
+            allowNull: true,
+            type: Sequelize.STRING
+        },
+        fromWhitelist:{
+            type: Sequelize.INTEGER(0,1),
+            allowNull: true
+        }
     }),
   down: (queryInterface /* , Sequelize */) => queryInterface.dropTable("Websites"),
 }     

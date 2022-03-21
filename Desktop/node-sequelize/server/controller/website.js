@@ -5,6 +5,7 @@ var cron = require('node-cron');
 const spawn = require("child_process").spawn;
 const path = require('path');
 const fs = require('fs');
+const generateHash = require('../utils/hashManager').hash;
 const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
 
 //ONCE A DAY SCRIPT
@@ -19,16 +20,8 @@ module.exports = {
   //GET ONE WEBSITE OR ALL OF TYPE
       async getAllWebsites(req, res) {
 
-        //IF ONLY HASH, VALIDATE RSA KEY
-        if(!req.query.fetchAll && !req.query.URL && !req.query.securityFlag && !req.query.categoryID && !req.query.RSA_Key && req.query.Hash) {
-          let websiteInWhitelist = await Website.findOne({where:{Hash: req.query.Hash}})
-          if(websiteInWhitelist){getKey(Hash)}
-          res.status(201).send('Now Validating Website...')
-        }
-        //IF ONLY HASH, VALIDATE RSA KEY
-
         //IF NOT ONLY HASH
-        let Websites = await Website.findAll({where:{securityFlag: req.query.securityFlag ? req.query.securityFlag : 1, categoryID: req.query.categoryID ? req.query.categoryID : 1, Hash: req.body.Hash ? req.body.Hash : null}})
+        let Websites = await Website.findAll({where:{securityFlag: req.query.securityFlag ? req.query.securityFlag : 1, categoryID: req.query.categoryID ? req.query.categoryID : 1}})
         try {
 
           //IF FETCHALL
@@ -63,13 +56,15 @@ module.exports = {
       async createWebsite(req, res) {
         try {
           Website.sync().then(function() {
+            if(req.body.url){
+              generateHash(req.body.url).then((hex) =>
             Website.findOrCreate({where:{
             URL: req.body.URL,
             securityFlag: req.body.securityFlag ? req.body.securityFlag: 1,
             categoryID: req.body.categoryID ? req.body.categoryID: 1,
             RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null,
-            Hash: req.body.Hash ? req.body.Hash : null
-          }}).then(function(result) {
+            Hash: hex
+          }})).then(function(result) {
             var thisWebsite = result[0],
             created = result[1];
             if(!created) 
@@ -80,7 +75,8 @@ module.exports = {
             res.status(201).send(thisWebsite)
             console.log("created Website")
           });
-          })
+          }//if url 
+        })
         }
            catch (e) {
           console.log(e)
@@ -98,12 +94,12 @@ module.exports = {
           })
     
           if (website) {
+            
             await Website.update({
              
                   securityFlag: req.body.securityFlag ? req.body.securityFlag : 1,
                   categoryID: req.body.categoryID ? req.body.categoryID : 1,
                   RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null,
-                  Hash: req.body.Hash ? req.body.Hash : null
                 },
                 {
                 where: {URL: req.body.URL}
@@ -162,13 +158,14 @@ module.exports = {
             })
       
             if (website) {
+              generateHash(website.url).then((hex) =>
               await Website.update({
-                  Hash: Hashes[i]
+                  Hash: hex
                   },
                   {
-                  where: {Hash: Hashes[i]}
+                  where: {Hash: website.Hash}
                   }
-              )
+              ))
         }
         else{continue}
       }

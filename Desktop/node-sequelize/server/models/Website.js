@@ -28,8 +28,17 @@ let Website = sequelize.define('Website', {
     },
     RSA_Key:{
         allowNull: true,
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
+    },
+    Hash:{
+        allowNull: true,
+        type: DataTypes.STRING
+    },
+    fromWhitelist:{
+        type: DataTypes.INTEGER(0,1),
+        allowNull: true
     }
+
 });
 
 Website.associate = function(models) {

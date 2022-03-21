@@ -16,7 +16,7 @@ let Website = sequelize.define('Website', {
 
     securityFlag: {
 
-        type: DataTypes.INTEGER(0,1),
+        type: DataTypes.BOOLEAN,
         allowNull: true,
         defaultValue: 1,
 
@@ -30,12 +30,12 @@ let Website = sequelize.define('Website', {
         allowNull: true,
         type: DataTypes.STRING
     },
-    Hash:{
+    hash:{
         allowNull: true,
         type: DataTypes.STRING
     },
-    fromWhitelist:{
-        type: DataTypes.INTEGER(0,1),
+    fromwhitelist:{
+        type: DataTypes.BOOLEAN,
         allowNull: true
     }
 

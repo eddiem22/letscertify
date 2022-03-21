@@ -10,6 +10,6 @@ require('./server/routes')(app);
 
 const PORT = 3456;
 const ADDRESS = ip.address();
-app.listen(PORT, () => {
-    console.log(`Server is listening to port ${PORT}`)
+app.listen(PORT, ADDRESS, () => {
+    console.log(`Server is listening to port ${PORT}, ${ADDRESS}`)
 })

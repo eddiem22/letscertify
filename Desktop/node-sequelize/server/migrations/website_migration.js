@@ -14,7 +14,7 @@ module.exports = {
          
         },
         securityFlag: {
-            type: Sequelize.INTEGER(0,1),
+            type: Sequelize.BOOL,
             allowNull: true,
             defaultValue: 1
         },
@@ -35,12 +35,12 @@ module.exports = {
             allowNull: true,
             type: Sequelize.STRING
         },
-        Hash:{
+        hash:{
             allowNull: true,
             type: Sequelize.STRING
         },
-        fromWhitelist:{
-            type: Sequelize.INTEGER(0,1),
+        fromwhitelist:{
+            type: Sequelize.BOOL,
             allowNull: true
         }
     }),

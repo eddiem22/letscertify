@@ -10,19 +10,19 @@ module.exports = app => {
       })
     })
   
-    app.get("/api/website", websiteController.getAllWebsites)
+    app.get("/api/website", websiteController.getWebsiteRequest)
 
     app.get("/api/website/RSA", websiteController.generateRandomKeys)
 
     app.get("/api/website/generateHashes", websiteController.generateHashes)
   
-    app.post("/api/website/create", websiteController.createWebsite)
+    app.post("/api/website/create", websiteController.createWebsiteRequest)
 
-    app.get("/api/website/check", websiteController.checkSecurity)
+    app.get("/api/website/check", websiteController.checkSecurityRequest)
   
-    app.put("/api/website/update", websiteController.updateWebsite)
+    app.put("/api/website/update", websiteController.updateWebsiteRequest)
 
-    app.delete("/api/website/delete", websiteController.deleteWebsite)
+    app.delete("/api/website/delete", websiteController.deleteWebsiteRequest)
   
     //app.get("/api/website/category", websiteController.getAllWebsitesOfCategory)
     

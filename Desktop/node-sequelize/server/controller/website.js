@@ -11,6 +11,7 @@ const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
 const SECURITY_SCRIPT = path.join(__dirname, '../securityScript.py');
 var forge = require('node-forge');
 var randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomPrime;
+const updateWebsite = require("../controllerModules/websiteModules").updateWebsiteModule;
 
 //ONCE A DAY SCRIPT
 /*cron.schedule('0 0 * * *', () => {
@@ -22,19 +23,20 @@ var randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomP
 module.exports = {
   
   //GET ONE WEBSITE OR ALL OF TYPE
-      async getAllWebsites(req, res) {
+      async getWebsiteRequest(req, res) {
         try {
-        //IF NOT ONLY HASH
+       
 
-        let Websites = await Website.findAll({where:
-          {securityFlag: req.query.securityFlag ? req.query.securityFlag : false, 
-          categoryID: req.query.categoryID ? req.query.categoryID : 1 }})
+        if(req.query.fetchAll) {
         
-          //IF FETCHALL
-          if(req.query.fetchAll) {res.status(201).send(Websites)}
-          //IF FETCHALL
+        await Website.findAll({where:
+          {
+            securityFlag: req.query.securityFlag ? req.query.securityFlag : false, 
+            categoryID: req.query.categoryID ? req.query.categoryID : 1 }
+        }).then(async(Websites) => {
+          res.status(201).send(Websites)
+        })}
 
-          //else for fetchAll specifier check
           else{
 
           //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL
@@ -61,7 +63,7 @@ module.exports = {
 
   //CREATE WEBSITE
          
-  async createWebsite(req, res) {
+  async createWebsiteRequest(req, res) {
     try {
       let thisHash = await generateHash(`${req.body.URL}`)
       Website.sync().then(async function() {
@@ -96,31 +98,16 @@ module.exports = {
     
 
 //UPDATE WEBSITE
-      async updateWebsite(req, res) {
+      async updateWebsiteRequest(req, res) {
         try {
           await Website.findOne({
            where:{URL: req.body.URL}
           }).then(async(website) => {
-          if (website) {
-            let preview = 
-            await Website.update(
-              {
-                  securityFlag: (!website.securityFlag && !req.body.securityFlag) ? 0 : (!website.securityFlag && req.body.securityFlag) ? req.body.securityFlag : (website.securityFlag && !req.body.securityFlag) ? website.securityFlag : 0,
-                  categoryID: (!website.categoryID && !req.body.categoryID) ? 1 : (!website.categoryID && req.body.categoryID) ? req.body.categoryID : (website.categoryID && !req.body.categoryID) ? website.categoryID : 1,
-                  RSA_Key: (!website.RSA_Key && !req.body.RSA_Key) ? await randomRSAKeyGenerator([100,1000]) : (!website.RSA_Key && req.body.RSA_Key) ? req.body.RSA_Key : (website.RSA_Key && !req.body.RSA_Key) ? website.RSA_Key : await randomRSAKeyGenerator([100,1000]),
-                  fromwhitelist: (!website.fromwhitelist && !req.body.fromwhitelist) ? 0 : (!website.fromwhitelist && req.body.fromwhitelist) ? req.body.fromwhitelist : (website.fromwhitelist && !req.body.fromwhitelist) ? website.fromwhitelist : false,
-                  hash: (!website.hash && !req.body.hash) ? await generateHash(website.URL)  : (!website.hash && req.body.hash) ? req.body.hash : (website.hash && !req.body.hash) ? website.hash : await generateHash(website.URL),
-
-                },
-
-                {
-                where: {URL: req.body.URL}
-                }
-            )
-            
-    
+          if(website) {
+            updateWebsite(website, req).then((preview) => {
             res.status(201).send(preview)
-              }
+          })
+        }
         else {
             res.status(404).send("Website Not Found")
           }
@@ -135,7 +122,7 @@ module.exports = {
 
 
 //DELETE WEBSITE
-    async deleteWebsite(req, res) {
+    async deleteWebsiteRequest(req, res) {
       try {
           let websiteForDeletion = await Website.findOne({where:{
            
@@ -160,8 +147,9 @@ module.exports = {
 //DELETE WEBSITE
 
 
+
 //GET RSA KEY
-  async getKey(websiteHash){
+  async getKeyRequest(websiteHash){
     try {
       let website = await Website.findOne({
        where:{hash: websiteHash}
@@ -179,14 +167,14 @@ catch(e) {console.log(e)}
 
 
   //SEND KEY TO ACCUMULATOR SCRIPT
-  async fromWhitelist(Key) {
+  async fromWhitelistRequest(Key) {
      const python = spawn('python3', [ACCUMULATOR, Key]);
      python.stdout.on('data', function(data) {
       return data.toString();
   } )
   },
 
-  async checkSecurity(req, res) {
+  async checkSecurityRequest(req, res) {
     let args = [];
     try{
     //if(req.query.URL) {

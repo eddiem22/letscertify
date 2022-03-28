@@ -9,7 +9,9 @@ const securityCommand = require('../utils/askSecurityScript').securityCommand;
 const generateHash = require('../utils/hashManager').hasher;
 const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
 const SECURITY_SCRIPT = path.join(__dirname, '../securityScript.py');
+const RSAGenerator = require('../utils/randomRSAKeyGenerator').getRandomPrime;
 var forge = require('node-forge');
+const randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomPrime;
 
 //ONCE A DAY SCRIPT
 /*cron.schedule('0 0 * * *', () => {
@@ -214,6 +216,29 @@ catch(e) {console.log(e)}
 
   },
 
+  async generateRandomKeys(){
+
+    const range = [100, 1000];
+    try{
+    let websites = await Website.findAll({where:{RSA_Key: null}})
+    for(website in websites)
+    {
+      let randomKey = await randomRSAKeyGenerator([100,1000])
+      await Website.update(
+        {
+            RSA_Key: randomKey
+          },
+          {
+          where: {RSA_Key: null}
+          }
+      )
+    }
+  }
+  catch(e)
+  {
+    console.log(e)
+  }
+  }
 
 
   //SEND KEY TO ACCUMULATOR SCRIPT

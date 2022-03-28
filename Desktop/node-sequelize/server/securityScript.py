@@ -1,8 +1,11 @@
 import sys
 import os
+import os.path
 import subprocess
 import requests
 from datetime import datetime
+path = 'proof.txt'
+dirname = os.path.dirname(path)
 
 print(os.getcwd())
 
@@ -64,7 +67,7 @@ def main():
 def authenticate(value, score):
     if value == 0:
         myip = requests.get("https://api.ipify.org").content.decode('utf-8')
-        payload = {"date":str(datetime.now()),"ip":str(myip),"score":str(score)}
+        payload = {"date":str(datetime.now()),"ip":str(myip),"securityFlag":str(score)}
         r = requests.post("https://httpbin.org/post", data = payload)
         
 
@@ -74,7 +77,7 @@ def authenticate(value, score):
         print(proof) 
 
         #now we actually create proof.txt
-        proof_file = open("/var/www/html/proof.txt", "w")
+        proof_file = open(dirname, "w")
         proof_file.write(proof)
         return
 

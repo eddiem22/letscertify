@@ -5,8 +5,10 @@ const cron = require('node-cron');
 const spawn = require("child_process").spawn;
 const path = require('path');
 const fs = require('fs');
+const securityCommand = require('../utils/askSecurityScript').securityCommand;
 const generateHash = require('../utils/hashManager').hasher;
 const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
+const SECURITY_SCRIPT = path.join(__dirname, '../securityScript.py');
 var forge = require('node-forge');
 
 //ONCE A DAY SCRIPT
@@ -97,12 +99,12 @@ module.exports = {
           })
     
           if (website) {
-            
             await Website.update(
               {
                   securityFlag: req.body.securityFlag ? req.body.securityFlag : true,
-                  categoryID: req.body.categoryID ? req.body.categoryID : 1,
+                  categoryID: req.body.categoryID ? req.body.categoryID: 1,
                   RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null,
+                  fromwhitelist: req.body.fromwhitelist ? req.body.fromwhitelist : false
                 },
 
                 {
@@ -113,7 +115,8 @@ module.exports = {
               where:{URL: req.body.URL}})
     
             res.status(201).send(website)
-          } else {
+          } 
+        else {
             res.status(404).send("Website Not Found")
           }
         } catch (e) {
@@ -176,6 +179,43 @@ catch(e) {console.log(e)}
       return data.toString();
   } )
   },
+
+  async checkSecurity(req, res) {
+    let args = [];
+    try{
+    //if(req.query.URL) {
+    //let website = await Website.findOne({where:{URL: req.query.URL}})
+    //if (website) {
+      if(req.query.command){ //if security script command field is selected
+      args[0] = req.query.URL ? req.query.URL : null;
+      args[1] = req.query.command;
+      let status = await securityCommand(args);
+      res.status(201).send(status);
+      }
+      else{throw "Command Not Found"}
+    //}
+ // }
+    /*
+    else{
+      if(req.query.command){ //if security script command field is selected
+        args[0] = '';
+        args[1] = `${req.query.command}`;
+        securityCommand(args)
+        }
+        else{throw "Command Not Found"}
+    }
+    */
+  }
+    catch(e)
+    {
+      console.log(e);
+      res.status(404).send(e);
+    }
+
+  },
+
+
+
   //SEND KEY TO ACCUMULATOR SCRIPT
 
 

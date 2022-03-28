@@ -10,9 +10,15 @@ module.exports = {
         let args = Command;
         let result = new Promise(function(resolve) {
         const python = spawn('python3', [SECURITY_SCRIPT, `${args[1]}`,]);
-        python.stdout.on('data', function(data) {
+        python.stdout.on('data', (data) => {
          resolve(data.toString('utf8'));
      })
+        python.stderr.on('data', (data) =>  {
+          resolve(data.toString('utf8'))})
+
+        python.stderr.on('close', () =>  {
+          resolve("Process Closed Abruptly")})
+
      })
      let status = await result;
      return status;

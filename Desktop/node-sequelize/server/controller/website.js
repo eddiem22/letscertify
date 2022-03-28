@@ -9,9 +9,9 @@ const securityCommand = require('../utils/askSecurityScript').securityCommand;
 const generateHash = require('../utils/hashManager').hasher;
 const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
 const SECURITY_SCRIPT = path.join(__dirname, '../securityScript.py');
-const RSAGenerator = require('../utils/randomRSAKeyGenerator').getRandomPrime;
 var forge = require('node-forge');
-const randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomPrime;
+const e = require("express");
+var randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomPrime;
 
 //ONCE A DAY SCRIPT
 /*cron.schedule('0 0 * * *', () => {
@@ -24,11 +24,13 @@ module.exports = {
   
   //GET ONE WEBSITE OR ALL OF TYPE
       async getAllWebsites(req, res) {
-
-        //IF NOT ONLY HASH
-        let Websites = await Website.findAll({where:{securityFlag: req.query.securityFlag ? req.query.securityFlag : true, categoryID: req.query.categoryID ? req.query.categoryID : 1 }})
         try {
+        //IF NOT ONLY HASH
 
+        let Websites = await Website.findAll({where:
+          {securityFlag: req.query.securityFlag ? req.query.securityFlag : false, 
+          categoryID: req.query.categoryID ? req.query.categoryID : 1 }})
+        
           //IF FETCHALL
           if(req.query.fetchAll) {res.status(201).send(Websites)}
           //IF FETCHALL
@@ -37,7 +39,8 @@ module.exports = {
           else{
 
           //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL
-          if(!req.query.URL){res.status(404).send("Please Enter URL")} else {let singleWebsite = await Website.findOne({where:{URL:req.query.URL}}); 
+          if(!req.query.URL){res.status(404).send("Please Enter URL")} else {await Website.findOne({where:{URL:req.query.URL}})
+          .then((async(singleWebsite) => { 
           //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL
 
           //IF SINGLE WEBSITE FOUND
@@ -45,10 +48,10 @@ module.exports = {
           //IF SINGLE WEBSITE FOUND
 
           //IF NO SINGLE WEBSITE FOUND
-          else{res.status(404).send("Website Not Found")}}
+          else{res.status(404).send("Website Not Found")}
           //IF SINGLE WEBSITE FOUND
-
-        }// end of else for fetchAll specifier check 
+          
+          }))}}// end of else for fetchAll specifier check 
         } catch (e) {
           console.log(e)
     
@@ -62,13 +65,13 @@ module.exports = {
   async createWebsite(req, res) {
     try {
       let thisHash = await generateHash(`${req.body.URL}`)
-      Website.sync().then(function() {
+      Website.sync().then(async function() {
         
         Website.findOrCreate({where:{
         URL: req.body.URL,
-        securityFlag: req.body.securityFlag ? req.body.securityFlag: true,
+        securityFlag: req.body.securityFlag ? req.body.securityFlag: false,
         categoryID: req.body.categoryID ? req.body.categoryID: 1,
-        RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null,
+        RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : await randomRSAKeyGenerator([100,1000]),
         hash: thisHash,
         fromwhitelist: req.body.whitelist ? req.body.whitelist: false
       }}).then(function(result) {
@@ -96,31 +99,31 @@ module.exports = {
 //UPDATE WEBSITE
       async updateWebsite(req, res) {
         try {
-          let website = await Website.findOne({
+          await Website.findOne({
            where:{URL: req.body.URL}
-          })
-    
+          }).then(async(website) => {
           if (website) {
+            let preview = 
             await Website.update(
               {
-                  securityFlag: req.body.securityFlag ? req.body.securityFlag : true,
-                  categoryID: req.body.categoryID ? req.body.categoryID: 1,
-                  RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null,
-                  fromwhitelist: req.body.fromwhitelist ? req.body.fromwhitelist : false
+                  securityFlag: (!website.securityFlag && !req.body.securityFlag) ? 0 : (!website.securityFlag && req.body.securityFlag) ? req.body.securityFlag : (website.securityFlag && !req.body.securityFlag) ? website.securityFlag : 0,
+                  categoryID: (!website.categoryID && !req.body.categoryID) ? 1 : (!website.categoryID && req.body.categoryID) ? req.body.categoryID : (website.categoryID && !req.body.categoryID) ? website.categoryID : 1,
+                  RSA_Key: (!website.RSA_Key && !req.body.RSA_Key) ? await randomRSAKeyGenerator([100,1000]) : (!website.RSA_Key && req.body.RSA_Key) ? req.body.RSA_Key : (website.RSA_Key && !req.body.RSA_Key) ? website.RSA_Key : await randomRSAKeyGenerator([100,1000]),
+                  fromwhitelist: (!website.fromwhitelist && !req.body.fromwhitelist) ? 0 : (!website.fromwhitelist && req.body.fromwhitelist) ? req.body.fromwhitelist : (website.fromwhitelist && !req.body.fromwhitelist) ? website.fromwhitelist : false,
                 },
 
                 {
                 where: {URL: req.body.URL}
                 }
             )
-            let website = await Website.findOne({
-              where:{URL: req.body.URL}})
+            
     
-            res.status(201).send(website)
-          } 
+            res.status(201).send(preview)
+              }
         else {
             res.status(404).send("Website Not Found")
           }
+        })
         } catch (e) {
           console.log(e)
     
@@ -220,25 +223,52 @@ catch(e) {console.log(e)}
 
     const range = [100, 1000];
     try{
-    let websites = await Website.findAll({where:{RSA_Key: null}})
+    await Website.findAll({where:{}}).then(async(websites) => {
+
     for(website in websites)
     {
-      let randomKey = await randomRSAKeyGenerator([100,1000])
-      await Website.update(
-        {
-            RSA_Key: randomKey
-          },
-          {
-          where: {RSA_Key: null}
-          }
-      )
-    }
+      if(website) {
+      await randomRSAKeyGenerator([100,1000]).then(async(randomKey) => {
+
+      Website.update({RSA_Key: randomKey}, {where:{id:websites[website].id}})})
+      }
+      else{continue}
+    
   }
+})
+}
   catch(e)
   {
     console.log(e)
   }
-  }
+  },
+
+  async generateHashes(){
+    try{
+       await Website.findAll({where:{}}).then(async(websites) => {
+      for(website in websites)
+      {
+        if(website) {await generateHash(websites[website].URL).then(async(newHash) => {
+        
+         Website.update(
+          {
+              hash: newHash
+            },
+            {
+            where: {id:websites[website].id}
+            }
+        )
+        })}
+          else{continue}
+        }
+      })}
+    
+    catch(e)
+    {
+      console.log(e)
+    }
+    },
+  
 
 
   //SEND KEY TO ACCUMULATOR SCRIPT

@@ -13,6 +13,8 @@ module.exports = app => {
     app.get("/api/website", websiteController.getAllWebsites)
 
     app.get("/api/website/RSA", websiteController.generateRandomKeys)
+
+    app.get("/api/website/generateHashes", websiteController.generateHashes)
   
     app.post("/api/website/create", websiteController.createWebsite)
 

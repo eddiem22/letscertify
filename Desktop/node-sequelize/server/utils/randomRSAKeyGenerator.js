@@ -1,5 +1,5 @@
 
-    const getValues =async(min, max) => {
+    let getValues =async(min, max) => {
         try{
         let getPrimeValues = new Promise(function(resolve) { 
         const result = Array(max + 1)
@@ -18,7 +18,7 @@
 }
 
 
-const getRandomNum =async(min, max) => {
+let getRandomNum =async(min, max) => {
     let randomNum =  new Promise(function(resolve) { 
    resolve(Math.floor(Math.random() * (max - min + 1) + min));
     })

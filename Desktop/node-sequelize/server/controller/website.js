@@ -10,7 +10,6 @@ const generateHash = require('../utils/hashManager').hasher;
 const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
 const SECURITY_SCRIPT = path.join(__dirname, '../securityScript.py');
 var forge = require('node-forge');
-const e = require("express");
 var randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomPrime;
 
 //ONCE A DAY SCRIPT
@@ -110,6 +109,8 @@ module.exports = {
                   categoryID: (!website.categoryID && !req.body.categoryID) ? 1 : (!website.categoryID && req.body.categoryID) ? req.body.categoryID : (website.categoryID && !req.body.categoryID) ? website.categoryID : 1,
                   RSA_Key: (!website.RSA_Key && !req.body.RSA_Key) ? await randomRSAKeyGenerator([100,1000]) : (!website.RSA_Key && req.body.RSA_Key) ? req.body.RSA_Key : (website.RSA_Key && !req.body.RSA_Key) ? website.RSA_Key : await randomRSAKeyGenerator([100,1000]),
                   fromwhitelist: (!website.fromwhitelist && !req.body.fromwhitelist) ? 0 : (!website.fromwhitelist && req.body.fromwhitelist) ? req.body.fromwhitelist : (website.fromwhitelist && !req.body.fromwhitelist) ? website.fromwhitelist : false,
+                  hash: (!website.hash && !req.body.hash) ? await generateHash(website.URL)  : (!website.hash && req.body.hash) ? req.body.hash : (website.hash && !req.body.hash) ? website.hash : await generateHash(website.URL),
+
                 },
 
                 {

@@ -96,7 +96,7 @@ module.exports = {
 
             async deleteWebsiteModule(req) {
                 try{ //TRY
-                   await Website.findOne({where:{
+                   await Website.findAll({where:{
            
                         URL: req.body.URL,
                         /*
@@ -106,11 +106,17 @@ module.exports = {
                         */
                       }}
                   )
-                  .then(async(websiteForDeletion) => {
-                    if(!(await Website.findOne({websiteForDeletion})))
-                    {return false}
+                  .then(async(websitesForDeletion) => {
+                    for(website in websitesForDeletion)
+                    {
+                      if(website)
+                    {await websitesForDeletion[website].destroy();}
                     else
-                    {await websiteForDeletion.destroy(); return true}
+                    {continue}
+                    }
+                    if(!Website.findOne({where:{URL:req.body.URL}}))
+                    {return true}
+                    else{return false}
                   })
                 } //TRY
                 catch(e)

@@ -24,10 +24,6 @@ module.exports = app => {
 
     app.delete("/api/website/delete", websiteController.deleteWebsiteRequest)
   
-    //app.get("/api/website/category", websiteController.getAllWebsitesOfCategory)
-    
-    //app.get("/api/website/securityFlag", websiteController.getAllWebsitesOfSecurityFlag)
-
     app.post("/api/category/create", categoryController.createCategory)
 
     app.get("/api/category", categoryController.getAllCategories)

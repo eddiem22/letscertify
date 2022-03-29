@@ -98,14 +98,8 @@ module.exports = {
                 try{ //TRY
                    await Website.findAll({where:{
            
-                        URL: req.body.URL,
-                        /*
-                        securityFlag: req.body.securityFlag ? req.body.securityFlag : true ,
-                        categoryID: req.body.categoryID ? req.body.categoryID : 1,
-                        RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null
-                        */
-                      }}
-                  )
+                        URL: req.body.URL, }})
+                                    
                   .then(async(websitesForDeletion) => {
                     for(website in websitesForDeletion)
                     {

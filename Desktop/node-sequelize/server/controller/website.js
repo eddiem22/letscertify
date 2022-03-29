@@ -1,6 +1,5 @@
 const Website = require("../models").Website;
 const Category = require("../models").Category;
-//const getHashes = require("../utils/getList").makeHashList;
 const cron = require('node-cron');
 const spawn = require("child_process").spawn;
 const path = require('path');
@@ -10,7 +9,6 @@ const generateHash = require('../utils/hashManager').hasher;
 const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
 const SECURITY_SCRIPT = path.join(__dirname, '../securityScript.py');
 var forge = require('node-forge');
-const { create } = require("domain");
 var randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomPrime;
 const updateWebsite = require("../controllerModules/websiteModules").updateWebsiteModule;
 const createWebsite = require("../controllerModules/websiteModules").createWebsiteModule;
@@ -115,9 +113,9 @@ module.exports = {
     async deleteWebsiteRequest(req, res) {
       try { //TRY
           await deleteWebsite(req).then(async(websiteIsDeleted) => {
-          if(websiteIsDeleted) {res.status(201).send('Website Deleted!')}
+          if(!websiteIsDeleted) {res.status(404).send("Website Was Not Deleted. Check your request parameters and try again. It may not exist in the database.")}
          else {
-          res.status(404).send("Website Not Found")
+          res.status(201).send('Website Deleted!');
         }
       })
       } //TRY

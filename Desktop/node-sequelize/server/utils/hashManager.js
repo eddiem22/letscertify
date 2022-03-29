@@ -13,7 +13,6 @@ module.exports = {
     }
     catch(e) {
       throw('error: no URL entered in hashing function')
-      console.log(e)
     }
 }
 }

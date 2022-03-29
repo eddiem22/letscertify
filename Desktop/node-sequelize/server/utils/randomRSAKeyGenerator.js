@@ -19,11 +19,16 @@
 
 
 let getRandomNum =async(min, max) => {
+    try
+    { //TRY
     let randomNum =  new Promise(function(resolve) { 
    resolve(Math.floor(Math.random() * (max - min + 1) + min));
-    })
+    }) //RESOLVE PROMISE
    let number = await randomNum;
    return number;
+    }//CATCH
+    catch(e)
+    {console.log(e);}
 }
 module.exports = {
 async getRandomPrime ([min, max]) {

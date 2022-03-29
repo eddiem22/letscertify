@@ -28,11 +28,11 @@ module.exports = {
               return newWebsite
             })
               }
-              else{return "Website Not Found"}
+              else{return null}
           }
           catch(e){
             console.log(e)
-            return e
+            //return e
           }
         },
 

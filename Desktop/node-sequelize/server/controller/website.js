@@ -28,10 +28,7 @@ module.exports = {
   //GET ONE WEBSITE OR ALL OF TYPE
       async getWebsiteRequest(req, res) {
         try {
-       
-
-        if(req.query.fetchAll) {
-        
+        if(req.query.fetchAll) {    
         await Website.findAll({where:
           {
             securityFlag: req.query.securityFlag ? req.query.securityFlag : false, 
@@ -39,10 +36,7 @@ module.exports = {
         }).then(async(Websites) => {
           res.status(201).send(Websites)
         })}
-
           else{
-
-          
           if(!req.query.URL)
           {res.status(404).send("Please Enter URL")} 
          //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL

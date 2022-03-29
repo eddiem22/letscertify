@@ -10,8 +10,11 @@ const generateHash = require('../utils/hashManager').hasher;
 const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
 const SECURITY_SCRIPT = path.join(__dirname, '../securityScript.py');
 var forge = require('node-forge');
+const { create } = require("domain");
 var randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomPrime;
 const updateWebsite = require("../controllerModules/websiteModules").updateWebsiteModule;
+const createWebsite = require("../controllerModules/websiteModules").createWebsiteModule;
+const deleteWebsite = require("../controllerModules/websiteModules").deleteWebsiteModule;
 
 //ONCE A DAY SCRIPT
 /*cron.schedule('0 0 * * *', () => {
@@ -39,11 +42,12 @@ module.exports = {
 
           else{
 
-          //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL
-          if(!req.query.URL){res.status(404).send("Please Enter URL")} else {await Website.findOne({where:{URL:req.query.URL}})
+          
+          if(!req.query.URL)
+          {res.status(404).send("Please Enter URL")} 
+         //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL
+          else {await Website.findOne({where:{URL:req.query.URL}})
           .then((async(singleWebsite) => { 
-          //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL
-
           //IF SINGLE WEBSITE FOUND
           if(singleWebsite){res.status(201).send(singleWebsite)}
           //IF SINGLE WEBSITE FOUND
@@ -65,30 +69,22 @@ module.exports = {
          
   async createWebsiteRequest(req, res) {
     try {
-      let thisHash = await generateHash(`${req.body.URL}`)
-      Website.sync().then(async function() {
-        
-        Website.findOrCreate({where:{
-        URL: req.body.URL,
-        securityFlag: req.body.securityFlag ? req.body.securityFlag: false,
-        categoryID: req.body.categoryID ? req.body.categoryID: 1,
-        RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : await randomRSAKeyGenerator([100,1000]),
-        hash: thisHash,
-        fromwhitelist: req.body.whitelist ? req.body.whitelist: false
-      }}).then(function(result) {
-        var thisWebsite = result[0],
-        created = result[1];
-        if(!created) 
-        {
-          console.log("already exists")
-          throw ("ERROR: CANNOT ADD DUPLICATE ENTRY, CHECK ID AND NAME")
+      Website.sync().then(async() => {
+        if(req){
+        await createWebsite(req).then(async(createdWebsite) => {
+          if(createdWebsite)
+          {
+            res.status(201).send(createdWebsite)
+            console.log("created Website")
+          }
+          else{
+            res.status(404).send("Error: Website Not Added, either already exists or an error exists in your request body")
+          }
+        })
       }
-        res.status(201).send(thisWebsite)
-        console.log("created Website")
-      });
-      })
+      else{res.status(404).send("no request body provided")}
+      }) 
     }
-
        catch (e) {
       console.log(e)
       res.status(400).send(e)
@@ -104,7 +100,7 @@ module.exports = {
            where:{URL: req.body.URL}
           }).then(async(website) => {
           if(website) {
-            updateWebsite(website, req).then((preview) => {
+            updateWebsite(website, req).then(async(preview) => {
             res.status(201).send(preview)
           })
         }
@@ -123,25 +119,16 @@ module.exports = {
 
 //DELETE WEBSITE
     async deleteWebsiteRequest(req, res) {
-      try {
-          let websiteForDeletion = await Website.findOne({where:{
-           
-                URL: req.body.URL,
-                securityFlag: req.body.securityFlag ? req.body.securityFlag : true ,
-                categoryID: req.body.categoryID ? req.body.categoryID : 1,
-                RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : null
-              }}
-          )
-          if(websiteForDeletion) {await websiteForDeletion.destroy()
-  
-          res.status(201).send('Website Deleted!')}
+      try { //TRY
+          await deleteWebsite(req).then(async(websiteIsDeleted) => {
+          if(websiteIsDeleted) {res.status(201).send('Website Deleted!')}
          else {
           res.status(404).send("Website Not Found")
         }
-      } catch (e) {
+      })
+      } //TRY
+      catch (e) {
         console.log(e)
-  
-        res.status(500).send(e)
       }
     },
 //DELETE WEBSITE
@@ -177,9 +164,6 @@ catch(e) {console.log(e)}
   async checkSecurityRequest(req, res) {
     let args = [];
     try{
-    //if(req.query.URL) {
-    //let website = await Website.findOne({where:{URL: req.query.URL}})
-    //if (website) {
       if(req.query.command){ //if security script command field is selected
       args[0] = req.query.URL ? req.query.URL : null;
       args[1] = req.query.command;
@@ -187,18 +171,7 @@ catch(e) {console.log(e)}
       res.status(201).send(status);
       }
       else{throw "Command Not Found"}
-    //}
- // }
-    /*
-    else{
-      if(req.query.command){ //if security script command field is selected
-        args[0] = '';
-        args[1] = `${req.query.command}`;
-        securityCommand(args)
-        }
-        else{throw "Command Not Found"}
-    }
-    */
+
   }
     catch(e)
     {

@@ -1,0 +1,30 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+body {
+  font-family: "font-family: "Comic Sans MS", "Comic Sans", cursive;";
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+  color: #050303;
+}
+
+a {
+  color: red;
+}
+
+a:hover {
+  opacity: 0.5;
+}
+
+body .icon {
+  font-size: 3rem;
+}
+
+#info
+{text-align: center; 
+ font-size: large; 
+ font-family: "font-family: "Franklin Gothic Medium", "Arial Narrow", sans-serif;"
+}
+

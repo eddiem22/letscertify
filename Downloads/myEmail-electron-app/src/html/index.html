@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Css styles -->
+    <link rel="stylesheet" href="./index.css" />
+    <!-- Fontawesome icon library -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">  
+    <title></title>
+  </head>
+
+
+<div class="contain">
+  <div class="wrapper">
+    <div class="aboutMe">
+      <h3>e-Mail Sender Application</h3>
+      <ul>
+        <li>Eduard Marcencov</li>
+        <li>CSC 190</li>
+        <li>emarcencov1@pride.hofstra.edu</li>
+      </ul>
+    </div>
+  <body>
+    <form id = "ipcForm">
+      <h3>Disposable Email Sender</h2>
+
+        <label for="autofill" style="text-align: center;">
+        <input type="checkbox" id="autofill" name="autofill" value = "yes">
+        Autofill?</label><br>
+        <label for="save" style="text-align: center;">
+          <input type="checkbox" id="save" name="save" value = "yes">
+         Save Credidentials?</label>
+       
+      <div class="input-wrapper">
+        <i class="fa fa-user icon"></i>
+        <input
+          id = "email"
+          class="input-field"
+          type="text"
+          placeholder="To:"
+          name="email"    
+        
+          required
+        />
+      </div>
+
+      <div class="input-wrapper">
+        <i class="fa fa-user icon"></i>
+      <input
+      id = "sender"
+      class="input-field"
+      type="text"
+      placeholder="Enter Your Email Address"
+      name="sender"    
+    
+      required
+    />
+  </div>
+
+  <div class="input-wrapper">
+    <i class="fa fa-key icon"></i>
+    <input
+    id = "password"
+    class="input-field"
+    type="text"
+    placeholder="Enter Password:"
+    name="password"    
+  
+    required
+  />
+</div>
+
+<div class="input-wrapper">
+  <i class="fa fa-envelope icon"></i>
+  <input
+  id = "smtpHost"
+  class="input-field"
+  type="text"
+  placeholder="Enter SMTP Host (example: yahoo, gmail):"
+  name="smtpHost"    
+
+  required
+/>
+</div>
+
+      <div class="input-wrapper">
+        <i class="fa fa-envelope icon"></i>
+        <input
+          id = "subject"
+          class="input-field"
+          type="text"
+          placeholder="Subject"
+          name="subject"
+          required
+        />
+      </div>
+
+      <div class="input-wrapper">
+        <textarea
+          id="message"
+          name="message"
+          placeholder="Message body.."
+          style="height: 250px; width: 100%"
+          required
+        ></textarea>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+    <script src = "./scripts/script.js"></script>
+    <script src = "./scripts/info.js"></script>
+  </body>
+</html>

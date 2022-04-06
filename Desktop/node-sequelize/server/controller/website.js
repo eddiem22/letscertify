@@ -1,44 +1,57 @@
 const Website = require("../models").Website;
-const Category = require("../models").Category;
 const cron = require('node-cron');
 const spawn = require("child_process").spawn;
+const {exec} = require("child_process");
 const path = require('path');
-const fs = require('fs');
 const securityCommand = require('../utils/askSecurityScript').securityCommand;
 const generateHash = require('../utils/hashManager').hasher;
 const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
 const SECURITY_SCRIPT = path.join(__dirname, '../securityScript.py');
-var forge = require('node-forge');
 var randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomPrime;
-const updateWebsite = require("../controllerModules/websiteModules").updateWebsiteModule;
-const createWebsite = require("../controllerModules/websiteModules").createWebsiteModule;
-const deleteWebsite = require("../controllerModules/websiteModules").deleteWebsiteModule;
+const {updateWebsite, createWebsite, deleteWebsite} = require('../controllerModules/websiteModules')
+const {Op} = require('sequelize');
 
 //ONCE A DAY SCRIPT
-/*cron.schedule('0 0 * * *', () => {
-  this.fillHashes()
-});
+cron.schedule('0 0 * * *', () => {
+  exec(SECURITY_SCRIPT), function(err, stdout, stderr)
+  { 
+    stdout.on("data", data => {
+      console.log(`Output: ${data.toString('utf8')}`);
+    });
+
+  stderr.on("data", data => {
+      console.log(`An error occurred! Error Description: ${data.toString('utf8')}`);
+  });
+}
+})
 //ONCE A DAY SCRIPT
-*/
+
 
 module.exports = {
   
   //GET ONE WEBSITE OR ALL OF TYPE
       async getWebsiteRequest(req, res) {
         try {
+          if(req){
         if(req.query.fetchAll) {    
-        await Website.findAll({where:
+        await Website.findAll({
+          where:
           {
-            securityFlag: req.query.securityFlag ? req.query.securityFlag : false, 
-            categoryID: req.query.categoryID ? req.query.categoryID : 1 }
-        }).then(async(Websites) => {
+            securityFlag: req.query.securityFlag ? req.query.securityFlag : {[Op.or] : [false, true]},
+            categoryID: req.query.categoryID ? req.categoryID : {[Op.gte]: 1},
+        }})
+        .then(async(Websites) => {
           res.status(201).send(Websites)
         })}
           else{
           if(!req.query.URL)
           {res.status(404).send("Please Enter URL")} 
          //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL
-          else {await Website.findOne({where:{URL:req.query.URL}})
+          else { 
+            await Website.findOne({where:
+              {
+               URL: {[Op.substring] : String(req.query.URL).split(".")[1]}
+          }})
           .then((async(singleWebsite) => { 
           //IF SINGLE WEBSITE FOUND
           if(singleWebsite){res.status(201).send(singleWebsite)}
@@ -49,7 +62,11 @@ module.exports = {
           //IF SINGLE WEBSITE FOUND
           
           }))}}// end of else for fetchAll specifier check 
-        } catch (e) {
+        }
+        
+        else{throw "No Request Body Provided"}
+      }
+         catch (e) {
           console.log(e)
     
           res.status(500).send(e)
@@ -66,8 +83,7 @@ module.exports = {
         await createWebsite(req).then(async(createdWebsite) => {
           if(createdWebsite)
           {
-            res.status(201).send(createdWebsite)
-            console.log("created Website")
+            res.status(201).send("created Website successfully")
           }
           else{
             res.status(404).send("Error: Website Not Added, either already exists or an error exists in your request body")
@@ -102,7 +118,6 @@ module.exports = {
         })
         } catch (e) {
           console.log(e)
-    
           res.status(500).send(e)
         }
       },
@@ -222,19 +237,16 @@ catch(e) {console.log(e)}
       console.log(e)
     }
     },
-  
-
-
-  //SEND KEY TO ACCUMULATOR SCRIPT
-
-
-    
-    
-
-
-
-
-
-
   }
+
+
+    
+    
+
+
+
+
+
+
+  
 

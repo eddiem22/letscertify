@@ -10,7 +10,7 @@ var randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomP
 
 module.exports = {
 
-    async updateWebsiteModule(websiteToBeUpdated, req) {
+    async updateWebsite(websiteToBeUpdated, req) {
         try{
           if(websiteToBeUpdated){
             await Website.update(
@@ -36,7 +36,7 @@ module.exports = {
           }
         },
 
-        async createWebsiteModule(req) {
+        async createWebsite(req) {
             try {
                 await Website.findOne({where:{URL: req.body.URL}}).then(async(duplicate) => {
                     if(duplicate){ //IF DUPLICATE FOUND
@@ -77,12 +77,11 @@ module.exports = {
                   if(!created[1]) 
                   {
                     console.log("already exists")
-                    return null;
+                    return false;
                 }
                   else{
-                    var thisWebsite = result[0]
                       console.log("created Website")
-                        return thisWebsite;
+                      return true ;
                     }
                 })
             }
@@ -94,7 +93,7 @@ module.exports = {
               }
             },
 
-            async deleteWebsiteModule(req) {
+            async deleteWebsite(req) {
                 try{ //TRY
                    await Website.findAll({where:{
            

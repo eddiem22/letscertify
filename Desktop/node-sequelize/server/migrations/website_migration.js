@@ -16,7 +16,7 @@ module.exports = {
         securityFlag: {
             type: Sequelize.BOOL,
             allowNull: true,
-            defaultValue: 1
+            defaultValue: 0
         },
         categoryID: {
             type: Sequelize.INTEGER,

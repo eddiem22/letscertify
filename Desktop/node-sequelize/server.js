@@ -2,17 +2,17 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 var ip = require("ip");
-const coors = require("coors");
+const cors = require("cors");
 console.log(ip.address());
 app.use(cors({
-  origin: "*"
+  origin: "*",
   credentials: true,
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : false}));
 require('./server/routes')(app);
 
-const PORT = 5432;
+const PORT = 3456;
 const ADDRESS = ip.address();
 
 app.listen(PORT, ADDRESS, () => {

@@ -1,15 +1,14 @@
 const path = require('path');
-const SECURITY_SCRIPT = path.join(__dirname, '../securityScript.py');
+const SECURITY_SCRIPT = path.join(__dirname, '../shcheck.py');
 const spawn = require("child_process").spawn;
 
 
 module.exports = {
 
-     async securityCommand(Command) {
+     async securityCommand(URL, command) {
         try{
-        let args = Command;
         let result = new Promise(function(resolve) {
-        const python = spawn('python3', [SECURITY_SCRIPT, `${args[1]}`,]);
+        const python = spawn('python3', [SECURITY_SCRIPT, `${URL}`, '-d', '-j']);
         python.stdout.on('data', (data) => {
          resolve(data.toString('utf8'));
      })
@@ -21,11 +20,11 @@ module.exports = {
 
      })
      let status = await result;
-     return status;
+     return JSON.parse(status);
     }
       catch(e){
         console.log(e);
-        //res.status(404).send("Could Not Retrieve Website Domain")
+        res.status(404).send("Could Not Retrieve Website Domain")
      }
     }
     

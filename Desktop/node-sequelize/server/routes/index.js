@@ -18,7 +18,9 @@ module.exports = app => {
   
     app.post("/api/website/create", websiteController.createWebsiteRequest)
 
-    app.get("/api/website/check", websiteController.checkSecurityRequest)
+    app.get("/api/website/check/", websiteController.checkSecurityRequest)
+
+    app.get("/api/website/verify", websiteController.fromWhitelistRequest)
   
     app.put("/api/website/update", websiteController.updateWebsiteRequest)
 
@@ -27,6 +29,8 @@ module.exports = app => {
     app.post("/api/category/create", categoryController.createCategory)
 
     app.get("/api/category", categoryController.getAllCategories)
+
+    app.get("/api/website/fixFlags", websiteController.fixAllFlags)
 
     app.put("/api/category/:categoryID", categoryController.updateCategory)
   }

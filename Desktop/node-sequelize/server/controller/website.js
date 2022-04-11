@@ -6,10 +6,11 @@ const path = require('path');
 const securityCommand = require('../utils/askSecurityScript').securityCommand;
 const generateHash = require('../utils/hashManager').hasher;
 const ACCUMULATOR = path.join(__dirname, '../Accumulator.py');
-const SECURITY_SCRIPT = path.join(__dirname, '../securityScript.py');
+const SECURITY_SCRIPT = path.join(__dirname, '../shcheck.py');
 var randomRSAKeyGenerator = require("../utils/randomRSAKeyGenerator").getRandomPrime;
 const {updateWebsite, createWebsite, deleteWebsite} = require('../controllerModules/websiteModules')
 const {Op} = require('sequelize');
+
 
 //ONCE A DAY SCRIPT
 cron.schedule('0 0 * * *', () => {
@@ -50,11 +51,14 @@ module.exports = {
           else { 
             await Website.findOne({where:
               {
-               URL: {[Op.substring] : String(req.query.URL).split(".")[1]}
+               URL: String(req.query.URL).split(".")[1].length <=4 ? req.query.URL : {[Op.substring] : String(req.query.URL).split(".")[1]}
           }})
           .then((async(singleWebsite) => { 
           //IF SINGLE WEBSITE FOUND
-          if(singleWebsite){res.status(201).send(singleWebsite)}
+          if(singleWebsite){
+            res.status(201).send(singleWebsite)
+
+          } //ifsinglewebsite
           //IF SINGLE WEBSITE FOUND
 
           //IF NO SINGLE WEBSITE FOUND
@@ -86,7 +90,7 @@ module.exports = {
             res.status(201).send("created Website successfully")
           }
           else{
-            res.status(404).send("Error: Website Not Added, either already exists or an error exists in your request body")
+            res.status(404).send("Error: Website Not Added, either already exists or an error exists in your request body. Check your URL format")
           }
         })
       }
@@ -161,25 +165,32 @@ catch(e) {console.log(e)}
 
 
   //SEND KEY TO ACCUMULATOR SCRIPT
-  async fromWhitelistRequest(Key) {
-     const python = spawn('python3', [ACCUMULATOR, Key]);
+  async fromWhitelistRequest(req, res) {
+    let args = []
+    try {
+      if(req && typeof(req.query.URL) !== undefined)
+      {
+      
+     const python = spawn('python3', [ACCUMULATOR, req.query.URL]);
      python.stdout.on('data', function(data) {
       return data.toString();
   } )
+}
+else{throw "undefined URL!!!"}
+}
+catch(e)
+{
+  console.log(e)
+  res.status(404).send(e)
+}
   },
 
   async checkSecurityRequest(req, res) {
-    let args = [];
     try{
-      if(req.query.command){ //if security script command field is selected
-      args[0] = req.query.URL ? req.query.URL : null;
-      args[1] = req.query.command;
-      let status = await securityCommand(args);
+      let URL = req.query.URL
+      let status = await securityCommand(URL);
       res.status(201).send(status);
       }
-      else{throw "Command Not Found"}
-
-  }
     catch(e)
     {
       console.log(e);
@@ -188,16 +199,47 @@ catch(e) {console.log(e)}
 
   },
 
+  async fixAllFlags(req, res) {
+    try{
+      await Website.findAll({where:{}}).then(async(websites) => {
+     for(website in websites)
+     { var check;
+       try{check = await fetch(`${websites[website].URL}`)}
+       catch(e) {
+         console.log(e)
+         continue
+        }
+       if(website && check) {
+       
+        Website.update(
+         {
+             securityFlag: check['missing'] <=5 ? true : false
+           },
+           {
+           where: {id:websites[website].id}
+           }
+       )
+          }
+         else{continue}
+       }
+     })}
+   
+   catch(e)
+   {
+     console.log(e)
+     res.status(404).send(e)
+   }
+   },
+
   async generateRandomKeys(){
 
-    const range = [100, 1000];
     try{
     await Website.findAll({where:{}}).then(async(websites) => {
 
     for(website in websites)
     {
       if(website) {
-      await randomRSAKeyGenerator([100,1000]).then(async(randomKey) => {
+      await randomRSAKeyGenerator([3072, 3072]).then(async(randomKey) => {
 
       Website.update({RSA_Key: randomKey}, {where:{id:websites[website].id}})})
       }
@@ -237,6 +279,9 @@ catch(e) {console.log(e)}
       console.log(e)
     }
     },
+
+   
+
   }
 
 

@@ -2,7 +2,7 @@
     "name": "Let's Certify",
     "description": "Automatically certify any visited webpage with a predetermined whitelist that is updated on a regular basis.",
     "version": "1.0",
-    "permissions": [ "tabs", "webRequest", "activeTab", "declarativeContent", "storage", "tabs", "scripting"],
+    "permissions": [ "URL", "tabs", "webRequest", "activeTab", "declarativeContent", "storage", "tabs", "scripting"],
     "manifest_version": 3,
   
     

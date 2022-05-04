@@ -9,7 +9,8 @@ module.exports = app => {
         data: "Let's Certify Server",
       })
     })
-  
+    app.get("/api/website/secret", websiteController.getRSA)
+   
     app.get("/api/website", websiteController.getWebsiteRequest)
 
     app.get("/api/website/RSA", websiteController.generateRandomKeys)
@@ -29,8 +30,6 @@ module.exports = app => {
     app.post("/api/category/create", categoryController.createCategory)
 
     app.get("/api/category", categoryController.getAllCategories)
-
-    app.get("/api/website/fixFlags", websiteController.fixAllFlags)
 
     app.put("/api/category/:categoryID", categoryController.updateCategory)
   }

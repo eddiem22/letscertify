@@ -71,7 +71,7 @@ def gen_prime(x_bits):
 def gen_distinct_primes(x_bits):
     #generates one prime, then continually generates a second prime until they do not match
     p = gen_prime(x_bits)
-    print("finished")
+   # print("finished")
     #n3 = input("how would you rate your experience today?")
     while True:
         q = gen_prime(x_bits)

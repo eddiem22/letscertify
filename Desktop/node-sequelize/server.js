@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended : false}));
 require('./server/routes')(app);
 
-const PORT = 3456;
+const PORT = process.env.PORT || 3456;
 const ADDRESS = ip.address();
 
 app.listen(PORT, ADDRESS, () => {

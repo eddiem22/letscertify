@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const app = express();
 var ip = require("ip");
 const cors = require("cors");
-console.log(ip.address());
 app.use(cors({
   origin: "*",
   credentials: true,

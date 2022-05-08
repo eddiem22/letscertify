@@ -37,8 +37,7 @@ async function getSecurityFlag(url) {
         <p></p>
         </tr>`;
         
-            console.log(li)
-            info.innerHTML = li;
+       info.innerHTML = li;
         
     //checkFlag(check)
     document.getElementById("infoP").innerHTML = li;
@@ -60,7 +59,6 @@ async function postRequest(url){
           referrerPolicy: 'no-referrer',
           body: JSON.stringify({'URL': `${url}`})
         });
-        console.log(createRequest.json);
       }
   catch(e){console.log(e);}
 }
@@ -84,7 +82,6 @@ async function updateFlag(url, flag){
           referrerPolicy: 'no-referrer',
           body: JSON.stringify({'URL': `${fullURL.hostname}`, 'securityFlag': `${flag}`, 'fromwhitelist': `${flag}`})
         });
-        //console.log(updateRequest.json);
         getSecurityFlag(fullURL.hostname)
   }
   catch(e){console.log(e);}
@@ -102,8 +99,7 @@ const getThisURL = async() => {
    function(tabs){
       //alert(tabs[0].url)
       let tab = tabs[0]
-      let link = new URL(tab.url)
-      //console.log(link)   
+      let link = new URL(tab.url) 
       resolve(link)
    }
   )
@@ -127,29 +123,17 @@ const parse_proof = async(textfile, accVal, n, url) => {
   
      
       let websites = textfile.split(' Website: ')
-      //let localStorage = {}
       websites.forEach((website) => 
       {
           let test = website.replace("Website: ", "").split('\n').join('')
-         // let title = (test.split(' ')[0])
           localStorage[test.split(' ')[0]] = test 
-          ////console.log(test.split(' ')[0])
       })
-      //console.log("websites are: ", localStorage)
-      //console.log('accval ', accVal, '\n', 'n: ', n)
       let website =  localStorage[url].split(' ')
       let Hash =  BigInt(website[2].replace(/\D/g,''))
       let proof =  BigInt(website[4].replace(/\D/g,''))
-      //console.log("proofs is ", proof)
-      //console.log("hash is ", Hash)
       let val1 = await power(proof, Hash, BigInt(n));
 
       await examine_proof(BigInt(val1), BigInt(accVal), url);
-      //console.log("val1 = ", val1)
-      //console.log("website is ", website)
-      //console.log(await examine_proof(BigInt(val1), BigInt(accVal), url))
-      
-      ////console.log(val1 === A)
 }
 
 
@@ -163,7 +147,6 @@ const retrieveAccValue = async() => {
     let accValue = vals[0].replace(/\D/g,'')
     let n = vals[1].replace(/\D/g,'')
     let arr = [accValue, n]
-    //console.log('retrieve test ', arr)
     resolve(arr)
   }
  )
@@ -193,22 +176,6 @@ return values;
   	////console.log(data);
   })
 }
-/*
-const power = (x, y, p) =>
-{
-    let res = BigInt(1);
-
-    x = x % p;
-    while (y > BigInt(0))
-    {
-        if (y & BigInt(1))
-            res = (res*x) % p;
-        y = y>>BigInt(1); // y = y/2
-        x = (x*x) % p;
-    }
-    return res;
-}
-*/
 
 const power = async(x, y, p) => {
 

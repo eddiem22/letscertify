@@ -1,15 +1,6 @@
 var getURL = document.getElementById('checkPage');
-var whitelist = document.getElementById('openWhiteList');
 var info = document.getElementById('infoP');
 var getProof = document.getElementById('checkProof');
-
-
-//var acc_value = getURL("https://rsa-whitelist/acc.txt")
-
-var imported = document.createElement('mathfams.js');
-imported.src = '/path/to/imported/script';
-document.head.appendChild(imported);
-
 
 
 ////////////////////////////////////////////////////////////////
@@ -20,21 +11,14 @@ getURL.addEventListener('click', async function(event){
 
 getProof.addEventListener('click', async function(event){ 
       await getThisURL().then(async function(link) {
-      await retrieve_proof(link.hostname??link) })
-        }, false)
-
- 
-whitelist.addEventListener('click', async function(event){ 
-      await getThisURL().then(async function(link) {
-       retrieve_proof(link) })
+      await retrieve_proof(link.hostname ?? link) })
         }, false)
  
 ////////////////////////////////////////////////////////////////
 
 
 async function getSecurityFlag(url) {
-    var check
-     fetch(`http://54.235.32.250:5432/api/website/?URL=${url}`)
+     fetch(`http://54.235.32.250:5432/api/website/?URL=${url.hostname ?? url}`)
     .then(response => response.json())
     .then(json => {
       //console.log(json)
@@ -85,13 +69,11 @@ async function postRequest(url){
 async function updateFlag(url, flag){
   try{
     let fullURL = await getThisURL();
-    let checkCreated = await fetch(`http://54.235.32.250:5432/api/website/?URL=${fullURL}`)
-    if(checkCreated.status === 404) {postRequest(fullURL); updateFlag(url, flag)}
+    let checkCreated = await fetch(`http://54.235.32.250:5432/api/website/?URL=${fullURL.hostname}`)
+    if(checkCreated.status !== 201) {postRequest(fullURL); updateFlag(fullURL, flag)}
  
-    let formData = {}
-    formData['URL'] = JSON.stringify(fullURL.hostname ?? fullURL.host)
-    formData['securityFlag'] = flag
-    console.log(formData)
+
+    //console.log(formData)
 
       const updateRequest = await fetch('http://54.235.32.250:5432/api/website/update', {
           method: 'PUT', 
@@ -100,10 +82,10 @@ async function updateFlag(url, flag){
           },
           redirect: 'follow',
           referrerPolicy: 'no-referrer',
-          body: JSON.stringify({'URL': `${fullURL.host ?? fullURL.hostname}`, 'securityFlag': `${flag}`})
+          body: JSON.stringify({'URL': `${fullURL.hostname}`, 'securityFlag': `${flag}`, 'fromwhitelist': `${flag}`})
         });
-        console.log(updateRequest.json);
-        getSecurityFlag(fullURL.hostname ?? fullURL.host)
+        //console.log(updateRequest.json);
+        getSecurityFlag(fullURL.hostname)
   }
   catch(e){console.log(e);}
 }
@@ -121,7 +103,7 @@ const getThisURL = async() => {
       //alert(tabs[0].url)
       let tab = tabs[0]
       let link = new URL(tab.url)
-      console.log(link)   
+      //console.log(link)   
       resolve(link)
    }
   )
@@ -136,8 +118,8 @@ return thisLink;
 
 
 const examine_proof = async(proof, accValue, url) => {
-  if(proof === accValue) {updateFlag(url, true)}
-  else updateFlag(url, false)
+  if(proof === accValue) updateFlag(url, true);
+  else updateFlag(url, false);
   return proof === accValue
 }
 
@@ -145,27 +127,29 @@ const parse_proof = async(textfile, accVal, n, url) => {
   
      
       let websites = textfile.split(' Website: ')
-      let siteMap = {}
+      //let localStorage = {}
       websites.forEach((website) => 
       {
           let test = website.replace("Website: ", "").split('\n').join('')
          // let title = (test.split(' ')[0])
-          siteMap[test.split(' ')[0]] = test 
-          //console.log(test.split(' ')[0])
+          localStorage[test.split(' ')[0]] = test 
+          ////console.log(test.split(' ')[0])
       })
-      console.log("websites are: ", siteMap)
-      console.log('accval ', accVal, '\n', 'n: ', n)
-      let website =  siteMap[url].split(' ')
+      //console.log("websites are: ", localStorage)
+      //console.log('accval ', accVal, '\n', 'n: ', n)
+      let website =  localStorage[url].split(' ')
       let Hash =  BigInt(website[2].replace(/\D/g,''))
       let proof =  BigInt(website[4].replace(/\D/g,''))
-      console.log("proofs is ", proof)
-      console.log("hash is ", Hash)
-      let val1 = power(proof, Hash, BigInt(n))
-      console.log("val1 = ", val1)
-      console.log("website is ", website)
-      console.log(await examine_proof(BigInt(val1), BigInt(accVal), url))
+      //console.log("proofs is ", proof)
+      //console.log("hash is ", Hash)
+      let val1 = await power(proof, Hash, BigInt(n));
+
+      await examine_proof(BigInt(val1), BigInt(accVal), url);
+      //console.log("val1 = ", val1)
+      //console.log("website is ", website)
+      //console.log(await examine_proof(BigInt(val1), BigInt(accVal), url))
       
-      //console.log(val1 === A)
+      ////console.log(val1 === A)
 }
 
 
@@ -179,7 +163,7 @@ const retrieveAccValue = async() => {
     let accValue = vals[0].replace(/\D/g,'')
     let n = vals[1].replace(/\D/g,'')
     let arr = [accValue, n]
-    console.log('retrieve test ', arr)
+    //console.log('retrieve test ', arr)
     resolve(arr)
   }
  )
@@ -191,35 +175,63 @@ return values;
 }
 
   const retrieve_proof = async(url) => {
-    console.log(url)
+    //console.log(url)
+    
+    let whiteListCheck = await fetch(`http://54.235.32.250:5432/api/website/?URL=${url.hostname ?? url}`)
+    .then(response => response.json())
+    .then(json => {return json.fromwhitelist})
+    if(whiteListCheck && whiteListCheck === true) getSecurityFlag(url);
+     
    fetch(`http://54.235.32.250:5432/api/website/verify/?URL=${url}`)
   .then(response => response.text())
   .then(async(data) => {
     let vals = await retrieveAccValue()
-    console.log('vals test ', vals)
+    //console.log('vals test ', vals)
     let accVal = vals[0]
     let n = vals[1]
   	parse_proof(data, accVal, n, url)
-  	//console.log(data);
+  	////console.log(data);
   })
 }
-
-function power(x, y, p)
+/*
+const power = (x, y, p) =>
 {
     let res = BigInt(1);
 
     x = x % p;
     while (y > BigInt(0))
     {
-         
-        // If y is odd, multiply
-        // x with result
         if (y & BigInt(1))
             res = (res*x) % p;
- 
-        // y must be even now
         y = y>>BigInt(1); // y = y/2
         x = (x*x) % p;
     }
     return res;
+}
+*/
+
+const power = async(x, y, p) => {
+
+try{
+  let pow = new Promise(function(resolve) {
+{
+    let res = BigInt(1);
+
+    x = x % p;
+    while (y > BigInt(0))
+    {
+        if (y & BigInt(1))
+            res = (res*x) % p;
+        y = y>>BigInt(1); // y = y/2
+        x = (x*x) % p;
+    }
+    resolve(res);
+}
+});
+let finalAnswer = await pow;
+return finalAnswer;
+  }
+  catch(e){
+    throw('error URL not found')
+  }
 }

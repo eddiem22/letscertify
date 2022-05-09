@@ -1,19 +1,12 @@
-## Welcome to GitHub Pages
+# Let's Certify
 
-You can use the [editor on GitHub](https://github.com/eddiem22/letscertify/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+# **What Is This?**
 
-### Markdown
+Our senior project that is centered on creating a self certifying API that provides SELF certification of a server. Whenever a server needs to self-certify itself, it will first download a security script that will test the server's vulnerability to penetration attacks. After passing the tests, the scripts responsible for the tests will then submit to the "Let's Certify" server in hopes for the server to be white listed. "Let's Certify" will maintain a database of the whitelisted server names, which will then be used in a cryptographic technique called an RSA accumulator. To verify if a server is part of the daily updated list of whitelisted servers, the accumulator only needs to perform a power function on a 3072 bit number. In order to make this more practical and applicable to websites visited by the user on their daily browser, a plug in will be developed that will interecept any URL requests, in order to obtain the "Let's Certify" certificate associated with that respective URL. Afterwards, the user will be notified that the website is deemed safe, and the security check is done.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Group members are as follows: Tomasz Mamro, Eduard Marcencov, Justin Graver, Joshua-Ronald Cruz.
 
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
 
 - Bulleted
 - List

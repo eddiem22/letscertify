@@ -11,11 +11,11 @@ module.exports = {
           if(websiteToBeUpdated){
             await Website.update(
               {
-                  securityFlag: req.body.securityFlag ?? websiteToBeUpdated.securityFlag ?? false,
-                  categoryID: req.body.categoryID ?? websiteToBeUpdated.categoryID ?? 1,
-                  RSA_Key: req.body.RSA_Key ?? websiteToBeUpdated.RSA_Key ?? await randomRSAKeyGenerator([100,1000]),
-                  fromwhitelist: req.body.fromwhitelist ?? websiteToBeUpdated.fromwhitelist ?? false,
-                  hash: req.body.hash ?? websiteToBeUpdated.hash ?? await generateHash(websiteToBeUpdated.URL),
+                  securityFlag: (req.body.securityFlag ?? websiteToBeUpdated.securityFlag) ?? false,
+                  categoryID: (req.body.categoryID ?? websiteToBeUpdated.categoryID) ?? 1,
+                  RSA_Key: (req.body.RSA_Key ?? websiteToBeUpdated.RSA_Key) ?? await randomRSAKeyGenerator([100,1000]),
+                  fromwhitelist: (req.body.fromwhitelist ?? websiteToBeUpdated.fromwhitelist) ?? false,
+                  hash: (req.body.hash ?? websiteToBeUpdated.hash) ?? await generateHash(websiteToBeUpdated.URL),
                 },
                 {
                 where: {id: websiteToBeUpdated.id}
@@ -41,11 +41,11 @@ module.exports = {
             else{
                 await Website.findOrCreate({where: {
                 URL: req.body.URL,
-                securityFlag: req.body.securityFlag ? req.body.securityFlag: false,
-                categoryID: req.body.categoryID ? req.body.categoryID : 1,
-                RSA_Key: req.body.RSA_Key ? req.body.RSA_Key : await randomRSAKeyGenerator([100,1000]),
-                fromwhitelist: req.body.fromwhitelist ? req.body.fromwhitelist : false,
-                hash: req.body.hash ? req.body.hash : await generateHash(req.body.URL),
+                securityFlag: req.body.securityFlag ?? false,
+                categoryID: req.body.categoryID ?? 1,
+                RSA_Key: req.body.RSA_Key ?? await randomRSAKeyGenerator([100,1000]),
+                fromwhitelist: req.body.fromwhitelist ?? false,
+                hash: req.body.hash ?? await generateHash(req.body.URL),
             }})
             .then(async(result) => {
                   created = result;

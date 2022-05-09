@@ -88,7 +88,7 @@ module.exports = {
 	 await createWebsite(req).then(async(createdWebsite) => {
           if(createdWebsite)
           {
-            res.status(201).send(`created Website successfully, ${created}`)
+            res.status(201).send(`created Website successfully, ${createdWebsite}`)
           }
           else{
             res.status(404).send("Error: Website Not Added, either already exists or an error exists in your request body")

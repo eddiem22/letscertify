@@ -86,8 +86,7 @@ module.exports = {
         if(req){
         if(typeof(req.query.URL) !== undefined && req) {
 	 await createWebsite(req).then(async(createdWebsite) => {
-	let created = Website.findOne({where:{URL:req.body.URL}})
-          if(created)
+          if(createdWebsite)
           {
             res.status(201).send(`created Website successfully, ${created}`)
           }

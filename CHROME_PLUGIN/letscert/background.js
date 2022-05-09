@@ -4,36 +4,32 @@ var getProof = document.getElementById('checkProof');
 
 
 ////////////////////////////////////////////////////////////////
-getURL.addEventListener('click', async function(event){ 
+/*getURL.addEventListener('click', async function(event){ 
   await getThisURL().then(async function(link) {
-  await getSecurityFlag(link.hostname) })
+  await getSecurityFlag(link.hostname ?? link) })
     }, false)
-
+*/
 getProof.addEventListener('click', async function(event){ 
       await getThisURL().then(async function(link) {
-      await retrieve_proof(link.hostname ?? link) })
+      await retrieve_proof(link) })
         }, false)
  
 ////////////////////////////////////////////////////////////////
 
 
 async function getSecurityFlag(url) {
-     fetch(`http://54.235.32.250:5432/api/website/?URL=${url.hostname ?? url}`)
+     fetch(`http://54.235.32.250:5432/api/website/?URL=${url}`)
     .then(response => response.json())
     .then(json => {
       //console.log(json)
-      check = json.securityFlag
       //console.log(check)
-
+        //if(json.securityflag  && json.fromwhitelist) {updateFlag(url, false); updateFlag(url, true);}
         let li = `<tr>
         <th><b>Website: </b></th> 
         <td>${json.URL} </td>
         <p></p>
         <th><b>Security Flag: </b></th>
-        <td>${json.securityFlag}</td> 
-        <p></p>
-        <th><b>From WhiteList?: </b></th>
-        <td>${json.fromwhitelist}</td> 
+        <td>${json.securityFlag ? 'Verified' : 'NOT Verified'}</td> 
         <p></p>
         </tr>`;
         
@@ -66,13 +62,9 @@ async function postRequest(url){
 
 async function updateFlag(url, flag){
   try{
-    let fullURL = await getThisURL();
-    let checkCreated = await fetch(`http://54.235.32.250:5432/api/website/?URL=${fullURL.hostname}`)
-    if(checkCreated.status !== 201) {postRequest(fullURL); updateFlag(fullURL, flag)}
+    let checkCreated = await fetch(`http://54.235.32.250:5432/api/website/?URL=${url.hostname ?? url}`)
+    if(checkCreated.status !== 201) {postRequest(url); updateFlag(url, flag)}
  
-
-    //console.log(formData)
-
       const updateRequest = await fetch('http://54.235.32.250:5432/api/website/update', {
           method: 'PUT', 
           headers: {
@@ -80,9 +72,10 @@ async function updateFlag(url, flag){
           },
           redirect: 'follow',
           referrerPolicy: 'no-referrer',
-          body: JSON.stringify({'URL': `${fullURL.hostname}`, 'securityFlag': `${flag}`, 'fromwhitelist': `${flag}`})
+          body: JSON.stringify({'URL': `${url.hostname ?? url}`, 'securityFlag': flag, 'fromwhitelist': flag}),
         });
-        getSecurityFlag(fullURL.hostname)
+        getSecurityFlag(url.hostname ?? url)
+        //console.log(updateFlag)
   }
   catch(e){console.log(e);}
 }
@@ -113,28 +106,13 @@ return thisLink;
   }
 
 
-const examine_proof = async(proof, accValue, url) => {
-  if(proof === accValue) updateFlag(url, true);
-  else updateFlag(url, false);
-  return proof === accValue
+  const closeTab = () => {
+    chrome.tabs.query({ active: true }, function(tabs) {  
+      chrome.tabs.remove(tabs[0].id);   
+  }); 
 }
-
-const parse_proof = async(textfile, accVal, n, url) => {
   
-     
-      let websites = textfile.split(' Website: ')
-      websites.forEach((website) => 
-      {
-          let test = website.replace("Website: ", "").split('\n').join('')
-          localStorage[test.split(' ')[0]] = test 
-      })
-      let website =  localStorage[url].split(' ')
-      let Hash =  BigInt(website[2].replace(/\D/g,''))
-      let proof =  BigInt(website[4].replace(/\D/g,''))
-      let val1 = await power(proof, Hash, BigInt(n));
 
-      await examine_proof(BigInt(val1), BigInt(accVal), url);
-}
 
 
 const retrieveAccValue = async() => {
@@ -147,6 +125,7 @@ const retrieveAccValue = async() => {
     let accValue = vals[0].replace(/\D/g,'')
     let n = vals[1].replace(/\D/g,'')
     let arr = [accValue, n]
+    console.log(arr);
     resolve(arr)
   }
  )
@@ -162,9 +141,12 @@ return values;
     
     let whiteListCheck = await fetch(`http://54.235.32.250:5432/api/website/?URL=${url.hostname ?? url}`)
     .then(response => response.json())
-    .then(json => {return json.fromwhitelist})
-    if(whiteListCheck && whiteListCheck === true) getSecurityFlag(url);
-     
+    .then(json => {return json})
+    if(whiteListCheck.fromwhitelist === true && whiteListCheck.securityFlag === true) return getSecurityFlag(url.hostname);
+  
+   //let prooftest = await fetch(`${url}/proof.txt`).then(response => response.status).then(async(data) => {return data})
+   //if(prooftest) p
+   
    fetch(`http://54.235.32.250:5432/api/website/verify/?URL=${url}`)
   .then(response => response.text())
   .then(async(data) => {
@@ -173,9 +155,47 @@ return values;
     let accVal = vals[0]
     let n = vals[1]
   	parse_proof(data, accVal, n, url)
+    
   	////console.log(data);
   })
 }
+
+
+
+const parse_proof = async(textfile, accVal, n, url) => {
+  
+     
+  let websites = textfile.split(' Website: ')
+  websites.forEach((website) => 
+  {
+      let test = website.replace("Website: ", "").split('\n').join('')
+      localStorage[test.split(' ')[0]] = test 
+  })
+  let website =  localStorage[url].split(' ')
+  let Hash =  BigInt(website[2].replace(/\D/g,''))
+  let proof =  BigInt(website[4].replace(/\D/g,''))
+  let val1 = await power(proof, Hash, BigInt(n));
+  console.log('accumulator value: ', val1, '\n', "website: ", website, '\n', "Hash: ", Hash, '\n', "proof: ", proof);
+
+  return examine_proof(BigInt(val1), BigInt(accVal), url);
+}
+
+
+
+const examine_proof = async(proof, accValue, url) => {
+  if(proof === accValue) updateFlag(url, true);
+  else {
+    let check = prompt('WARNING: This Website Has Not Been Verified. Proceed with caution! Type 1 to Continue, 2 to Block')
+    if(parseInt(check) === 1) getSecurityFlag(url);
+    else if (parseInt(check) === 2) closeTab();
+  }
+  console.log("accumulator is valid? ", proof === accValue)
+  return proof === accValue
+}
+
+
+
+
 
 const power = async(x, y, p) => {
 

@@ -84,7 +84,7 @@ module.exports = {
     try {
       Website.sync().then(async() => {
         if(req){
-        if(typeof(req.query.URL) !== undefined && req) {
+        if(typeof(req.query.URL) !== undefined) {
 	 await createWebsite(req).then(async(createdWebsite) => {
           if(createdWebsite)
           {

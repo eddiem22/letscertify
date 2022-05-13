@@ -1,14 +1,5 @@
-var getURL = document.getElementById('checkPage');
-var info = document.getElementById('infoP');
 var getProof = document.getElementById('checkProof');
 
-
-////////////////////////////////////////////////////////////////
-/*getURL.addEventListener('click', async function(event){ 
-  await getThisURL().then(async function(link) {
-  await getSecurityFlag(link.hostname ?? link) })
-    }, false)
-*/
 getProof.addEventListener('click', async function(event){ 
       await getThisURL().then(async function(link) {
       await retrieve_proof(link) })
@@ -21,9 +12,6 @@ async function getSecurityFlag(url) {
      fetch(`http://54.235.32.250:5432/api/website/?URL=${url}`)
     .then(response => response.json())
     .then(json => {
-      //console.log(json)
-      //console.log(check)
-        //if(json.securityflag  && json.fromwhitelist) {updateFlag(url, false); updateFlag(url, true);}
         let li = `<tr>
         <th><b>Website: </b></th> 
         <td>${json.URL} </td>
@@ -35,8 +23,6 @@ async function getSecurityFlag(url) {
         
        info.innerHTML = li;
         
-    //checkFlag(check)
-    document.getElementById("infoP").innerHTML = li;
     }).catch(function(error) {  
     console.log('Request failed', error)  
     postRequest(url)
@@ -72,7 +58,7 @@ async function updateFlag(url, flag){
           },
           redirect: 'follow',
           referrerPolicy: 'no-referrer',
-          body: JSON.stringify({'URL': `${url.hostname ?? url}`, 'securityFlag': flag, 'fromwhitelist': flag}),
+          body: JSON.stringify({'URL': `${url.hostname ?? url}`, 'securityFlag': flag}),
         });
         getSecurityFlag(url.hostname ?? url)
         //console.log(updateFlag)
@@ -142,7 +128,7 @@ return values;
     let whiteListCheck = await fetch(`http://54.235.32.250:5432/api/website/?URL=${url.hostname ?? url}`)
     .then(response => response.json())
     .then(json => {return json})
-    if(whiteListCheck.fromwhitelist === true && whiteListCheck.securityFlag === true) return getSecurityFlag(url.hostname);
+    if(whiteListCheck.securityFlag === true) return getSecurityFlag(url.hostname);
   
    //let prooftest = await fetch(`${url}/proof.txt`).then(response => response.status).then(async(data) => {return data})
    //if(prooftest) p
@@ -155,8 +141,6 @@ return values;
     let accVal = vals[0]
     let n = vals[1]
   	parse_proof(data, accVal, n, url)
-    
-  	////console.log(data);
   })
 }
 
@@ -209,7 +193,7 @@ try{
     {
         if (y & BigInt(1))
             res = (res*x) % p;
-        y = y>>BigInt(1); // y = y/2
+        y = y>>BigInt(1); 
         x = (x*x) % p;
     }
     resolve(res);

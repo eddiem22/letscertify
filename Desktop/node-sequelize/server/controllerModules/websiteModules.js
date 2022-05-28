@@ -24,12 +24,12 @@ module.exports = {
               return newWebsite
             })
               }
-              else return
+              else return;
           }
-	else{throw "He cant keep getting away with this!!!"}
+	else throw "He cant keep getting away with this!!!";
 	}
           catch(e){
-            console.log(e)
+            //console.log(e)
             //return e
           }
         },
@@ -49,23 +49,16 @@ module.exports = {
             }})
             .then(async(result) => {
                   created = result;
-                  if(!created[1]) 
-                  {
-                    console.log("already exists")
-                    return false;
-                }
-                  else{
-                      console.log("created Website")
-                      return true ;
-                    }
+                  if(!created[1]) return;
+                  else return true;
                 })
             }
         })
 }
-	else{throw "He cant keep getting away with this!!! Parse your JSON!!!"}
+	else throw "He cant keep getting away with this!!! Parse your JSON!!!";
     }
          catch (e) {
-                console.log(e)
+                //console.log(e)
                 //return e
               }
             },
@@ -79,14 +72,10 @@ module.exports = {
                   .then(async(websitesForDeletion) => {
                     for(website in websitesForDeletion)
                     {
-                      if(website)
-                    {await websitesForDeletion[website].destroy();}
-                    else
-                    {continue}
+                      if(website) await websitesForDeletion[website].destroy();
                     }
-                    if(!Website.findOne({where:{URL:req.body.URL}}))
-                    {return true}
-                    else{return false}
+                    if(!Website.findOne({where:{URL:req.body.URL}})) return true;
+                    else return false;
                   })
                 } //TRY
                 catch(e)

@@ -61,17 +61,17 @@ module.exports = {
           //IF SINGLE WEBSITE FOUND
 
           //IF NO SINGLE WEBSITE FOUND
-          else{res.status(404).send("Website Not Found")}
+          else res.status(404).send("Website Not Found");
           //IF SINGLE WEBSITE FOUND
           
           }))}}// end of else for fetchAll specifier check 
         }
-	else{throw "Invalid URL Format! Parse your query first!!!"}
+	else throw "Invalid URL Format! Parse your query first!!!";
         }
-        else{throw "No Request Body Provided"}
+        else throw "No Request Body Provided";
       }
          catch (e) {
-          console.log(e)
+          //console.log(e)
     
           res.status(500).send(e)
         }
@@ -90,18 +90,16 @@ module.exports = {
           {
             res.status(201).send(`created Website successfully, ${JSON.stringify(createdWebsite)}`)
           }
-          else{
-            res.status(404).send("Error: Website Not Added, either already exists or an error exists in your request body")
-          }
+          else res.status(404).send("Error: Website Not Added, either already exists or an error exists in your request body");
         })
       }
-     else{res.status(404).send("Parse your JSON!!!"); throw "Another Non Parser Coming Through"}
+     else res.status(404).send("Parse your JSON!!!"); throw "Another Non Parser Coming Through";
       }
-     else{res.status(404).send("no request body provided")}
+     else res.status(404).send("no request body provided"); 
       
     })}
        catch (e) {
-      console.log(e)
+      //console.log(e)
       res.status(400).send(e)
     }
   },
@@ -120,13 +118,12 @@ module.exports = {
             res.status(201).send(preview)
           })
         }
-        else {
-            res.status(404).send("Website Not Found")
-          }
+        else res.status(404).send("Website Not Found");
+          
         })}
 	else{res.status(404).send("Parse Your JSON!!!"); throw "Another Non Parser Coming Through"}
         } catch (e) {
-          console.log(e)
+          //console.log(e)
           res.status(500).send(e)
         }
       },
@@ -139,15 +136,13 @@ module.exports = {
 	if(typeof(req.query.URL) !== undefined) {
           await deleteWebsite(req).then(async(websiteIsDeleted) => {
           if(!websiteIsDeleted) {res.status(404).send("Website Was Not Deleted. Check your request parameters and try again. It may not exist in the database.")}
-         else {
-          res.status(201).send('Website Deleted!');
-        }
+         else res.status(201).send('Website Deleted!');
       })
 	}
 	else {res.status(404).send("Parse Your JSON!!!"); throw "Another Non Parser Coming Through"}
       } //TRY
       catch (e) {
-        console.log(e)
+        //console.log(e)
       }
     },
 //DELETE WEBSITE
@@ -162,12 +157,12 @@ module.exports = {
       })
 
       if (website) {
-      if(website.RSA_Key) {return website.RSA_Key}
-      else{return null}
+      if(website.RSA_Key) return website.RSA_Key;
+      else return;
   }
   else{return null}
 }
-catch(e) {console.log(e)}
+catch(e) {//console.log(e)}
 },
   //GET RSA KEY
 
@@ -191,13 +186,14 @@ catch(e) {console.log(e)}
    })
    let status = await result
    fs.writeFile((path.join(__dirname, 'accValue.txt')), status, err => {
-	   if(err) {console.log(err); throw "Accumulator Value Not Found"}})
+	   if(err) 
+	   {throw "Accumulator Value Not Found"}})
   //let AccValue = status.split('Website: :')
-   console.log('acc', status)
+   //console.log('acc', status)
    //res.send(status)
    let proof = 'Proof.txt'
    res.download(proof, async function(err) {
-     console.log(err)
+     //console.log(err)
    })
    //console.log(status)
   }
@@ -213,10 +209,7 @@ catch(e)
  async getRSA(req, res) {
 	//res.redirect('api/website/secret')
 	let accValue = path.join(__dirname, 'accValue.txt');
-	if(accValue)  
-	 {
-          res.download(accValue, async function(err) {console.log(err)})
-         }
+	if(accValue) res.download(accValue, async function(err) {console.log(err)});
           
 	else res.status(404).send("RSA Not Found");
  },
@@ -230,7 +223,7 @@ catch(e)
       }
     catch(e)
     {
-      console.log(e);
+      //console.log(e);
       res.status(404).send("Unable To Access Website, Please Try Again Later!");
     }
 
@@ -250,14 +243,14 @@ catch(e)
 
       Website.update({RSA_Key: randomKey}, {where:{id:websites[website].id}})})
       }
-      else{continue}
+      else continue;
     
   }
 })
 }
   catch(e)
   {
-    console.log(e)
+    //console.log(e)
   }
   },
 
@@ -283,7 +276,7 @@ catch(e)
     
     catch(e)
     {
-      console.log(e)
+     // console.log(e)
     }
     },
   }

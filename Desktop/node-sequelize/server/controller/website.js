@@ -135,11 +135,11 @@ module.exports = {
       try { //TRY
 	if(typeof(req.query.URL) !== undefined) {
           await deleteWebsite(req).then(async(websiteIsDeleted) => {
-          if(!websiteIsDeleted) {res.status(404).send("Website Was Not Deleted. Check your request parameters and try again. It may not exist in the database.")}
+          if(!websiteIsDeleted) res.status(404).send("Website Was Not Deleted. Check your request parameters and try again. It may not exist in the database.");
          else res.status(201).send('Website Deleted!');
       })
 	}
-	else {res.status(404).send("Parse Your JSON!!!"); throw "Another Non Parser Coming Through"}
+	else res.status(404).send("Parse Your JSON!!!"); throw "Another Non Parser Coming Through";
       } //TRY
       catch (e) {
         //console.log(e)
@@ -160,16 +160,16 @@ module.exports = {
       if(website.RSA_Key) return website.RSA_Key;
       else return;
   }
-  else{return null}
+  else return;
 }
-catch(e) {//console.log(e)}
-},
+catch(e) 
+{//console.log(e)}},
   //GET RSA KEY
 
 
   //SEND KEY TO ACCUMULATOR SCRIPT
   async fromWhitelistRequest(req, res) {
-	if(!req || typeof(req.query.URL) === undefined) {res.status(404).send("Enter a URL!!"); throw "No URL Entered!!!"}
+	if(!req || typeof(req.query.URL) === undefined) throw "No URL Entered!!!";
     try{
       let URL = req.query.URL
       let result = new Promise(function(resolve) {
@@ -199,7 +199,7 @@ catch(e) {//console.log(e)}
   }
 catch(e)
 {
-  console.log(e)
+  //console.log(e)
   res.status(404).send(e)
 }  
 
@@ -270,7 +270,7 @@ catch(e)
             }
         )
         })}
-          else{continue}
+          else continue;
         }
       })}
     

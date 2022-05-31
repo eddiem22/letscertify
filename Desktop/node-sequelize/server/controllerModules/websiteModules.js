@@ -36,9 +36,9 @@ module.exports = {
 
         async createWebsite(req) {
             try {
+		    
 		if(typeof(req.body.URL) !== undefined) {
-
-            else{
+			
                 await Website.findOrCreate({where: {
                 URL: req.body.URL,
                 securityFlag: req.body.securityFlag ?? false,
@@ -80,7 +80,7 @@ module.exports = {
                 } //TRY
                 catch(e)
                 {
-                    console.log(e)
+                    //console.log(e)
                 }
             },
 

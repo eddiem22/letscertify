@@ -33,10 +33,8 @@ module.exports = {
   //GET ONE WEBSITE OR ALL OF TYPE
       async getWebsiteRequest(req, res) {
         try {
-          if(req){
-		if(typeof(req.query.URL) !== undefined)
-			{
-       			 if(req.query.fetchAll) {    
+	if(req && typeof(req.query.URL) !== undefined){
+       	if(req.query.fetchAll) {    
         await Website.findAll({
           where:
           {
@@ -46,34 +44,21 @@ module.exports = {
         .then(async(Websites) => {
           res.status(201).send(Websites)
         })}
-          else{
-          if(!req.query.URL)
-          {res.status(404).send("Please Enter URL")}
-         //IF NO URL, 404, ELSE FIND SINGLE WEBSITE WITH URL
-          else { 
+          else
+	  {
             await Website.findOne({where:
-              {
-               URL: typeof(String(req.query.URL).split(".")[1]) === undefined || (String(req.query.URL).split('')[1] && String(req.query.URL).split('.')[2] <= 4) ? req.query.URL : {[Op.like] : String(`%${req.query.URL}%`)},
-          }})
+            {URL: typeof(String(req.query.URL).split(".")[1]) === undefined || (String(req.query.URL).split('')[1] && String(req.query.URL).split('.')[2] <= 4) ? req.query.URL : {[Op.like] : String(`%${req.query.URL}%`)}}})
           .then((async(singleWebsite) => { 
-          //IF SINGLE WEBSITE FOUND
-          if(singleWebsite){res.status(201).send(singleWebsite)}
-          //IF SINGLE WEBSITE FOUND
-
-          //IF NO SINGLE WEBSITE FOUND
+          if(singleWebsite) res.status(201).send(singleWebsite);
+		    
           else res.status(404).send("Website Not Found");
-          //IF SINGLE WEBSITE FOUND
-          
+
           }))}}// end of else for fetchAll specifier check 
         }
-	else throw "Invalid URL Format! Parse your query first!!!";
-        }
-        else throw "No Request Body Provided";
-      }
+	else res.status(404).send("Please Enter URL");
+        }}
          catch (e) {
-          //console.log(e)
-    
-          res.status(500).send(e)
+  	 res.status(404).send(e)
         }
       },
 //GET ONE WEBSITE OR ALL OF TYPE

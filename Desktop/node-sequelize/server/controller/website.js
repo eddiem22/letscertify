@@ -73,12 +73,12 @@ module.exports = {
 	 await createWebsite(req).then(async(createdWebsite) => {
           if(createdWebsite)
           {
-            res.status(201).send(`created Website successfully, ${JSON.stringify(createdWebsite)}`)
+            res.status(201).send(`created Website successfully, ${createdWebsite}`)
           }
           else res.status(404).send("Error: Website Not Added, either already exists or an error exists in your request body");
         })
       }
-     else res.status(404).send("Parse your JSON!!!"); throw "Another Non Parser Coming Through";
+     else res.status(404).send("Parse your JSON!!!"); 
       }
      else res.status(404).send("no request body provided"); 
       
@@ -100,15 +100,14 @@ module.exports = {
           }).then(async(website) => {
           if(website) {
             updateWebsite(website, req).then(async(preview) => {
-            res.status(201).send(preview)
+            res.status(201).send(preview);
           })
         }
         else res.status(404).send("Website Not Found");
           
         })}
-	else{res.status(404).send("Parse Your JSON!!!"); throw "Another Non Parser Coming Through"}
+	else res.status(404).send("Parse Your JSON!!!");
         } catch (e) {
-          //console.log(e)
           res.status(500).send(e)
         }
       },
@@ -124,7 +123,7 @@ module.exports = {
          else res.status(201).send('Website Deleted!');
       })
 	}
-	else res.status(404).send("Parse Your JSON!!!"); throw "Another Non Parser Coming Through";
+	else res.status(404).send("Parse Your JSON!!!"); 
       } //TRY
       catch (e) {
         //console.log(e)
@@ -154,7 +153,7 @@ catch(e)
 
   //SEND KEY TO ACCUMULATOR SCRIPT
   async fromWhitelistRequest(req, res) {
-	if(!req || typeof(req.query.URL) === undefined) throw "No URL Entered!!!";
+if(!req || typeof(req.query.URL) === undefined) throw "No URL Entered!!!";
     try{
       let URL = req.query.URL
       let result = new Promise(function(resolve) {

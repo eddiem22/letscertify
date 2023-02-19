@@ -53,8 +53,6 @@ module.exports = {
                   else return true;
                 })
             }
-        })
-}
 	else throw "He cant keep getting away with this!!! Parse your JSON!!!";
     }
          catch (e) {
@@ -70,7 +68,7 @@ module.exports = {
                         URL: req.body.URL, }})
                                     
                   .then(async(websitesForDeletion) => {
-                    for(website in websitesForDeletion)
+                    for(let website in websitesForDeletion)
                     {
                       if(website) await websitesForDeletion[website].destroy();
                     }

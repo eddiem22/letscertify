@@ -6,14 +6,9 @@ const Category = db.Category;
 module.exports = {
       async getAllCategories(req, res) {
         try {
-          const Categories = await Category.findAll(
-            {where:{}}
-          )
-    
+          const Categories = await Category.findAll({where:{}})
           res.status(201).send(Categories)
         } catch (e) {
-          console.log(e)
-    
           res.status(500).send(e)
         }
       },
@@ -29,8 +24,7 @@ module.exports = {
             created = result[1];
             if(!created) {console.log("already exists")
             throw ("ERROR: CANNOT ADD DUPLICATE ENTRY, CHECK ID AND NAME")}
-            else{res.status(201).send(thisCategory)
-            console.log("created category")}
+            else{res.status(201).send(thisCategory)}
           });
           })
         }
@@ -58,10 +52,6 @@ module.exports = {
           } else {
             res.status(404).send("Category Not Found")
           }
-        } catch (e) {
-          console.log(e)
-    
-          res.status(500).send(e)
-        }
+        } catch (e) { res.status(500).send(e) }
       },
     }

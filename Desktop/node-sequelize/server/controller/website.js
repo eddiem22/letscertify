@@ -34,7 +34,7 @@ module.exports = {
       async getWebsiteRequest(req, res) {
         try {
 	if(req && typeof(req.query.URL) !== undefined){
-       	if(req.query.fetchAll) {    
+      if(req.query.fetchAll) {    
         await Website.findAll({
           where:
           {
@@ -46,17 +46,18 @@ module.exports = {
         })}
           else
 	  {
-            await Website.findOne({where:
-            {URL: typeof(String(req.query.URL).split(".")[1]) === undefined || (String(req.query.URL).split('')[1] && String(req.query.URL).split('.')[2] <= 4) ? req.query.URL : {[Op.like] : String(`%${req.query.URL}%`)}}})
+            await Website.findOne({where: {URL: typeof(String(req.query.URL).split(".")[1]) === undefined 
+              || (String(req.query.URL).split('')[1] && String(req.query.URL).split('.')[2] <= 4) 
+                ? req.query.URL : {[Op.like] 
+                : String(`%${req.query.URL}%`)}}})
           .then((async(singleWebsite) => { 
           if(singleWebsite) res.status(201).send(singleWebsite);
 		    
           else res.status(404).send("Website Not Found");
 
           }))}}// end of else for fetchAll specifier check 
+	    else res.status(404).send("Please Enter URL");
         }
-	else res.status(404).send("Please Enter URL");
-        }}
          catch (e) {
   	 res.status(404).send(e)
         }
@@ -146,8 +147,7 @@ module.exports = {
   }
   else return;
 }
-catch(e) 
-{//console.log(e)}},
+catch(e) { console.log(e)} },
   //GET RSA KEY
 
 
@@ -170,22 +170,12 @@ if(!req || typeof(req.query.URL) === undefined) throw "No URL Entered!!!";
    })
    let status = await result
    fs.writeFile((path.join(__dirname, 'accValue.txt')), status, err => {
-	   if(err) 
-	   {throw "Accumulator Value Not Found"}})
-  //let AccValue = status.split('Website: :')
-   //console.log('acc', status)
-   //res.send(status)
+	   if(err) throw "Accumulator Value Not Found"})
    let proof = 'Proof.txt'
    res.download(proof, async function(err) {
-     //console.log(err)
    })
-   //console.log(status)
   }
-catch(e)
-{
-  //console.log(e)
-  res.status(404).send(e)
-}  
+catch(e) { res.status(404).send(e) }  
 
 
 },
@@ -219,12 +209,10 @@ catch(e)
     const range = [100, 1000];
     try{
     await Website.findAll({where:{}}).then(async(websites) => {
-
-    for(website in websites)
+    for(let website in websites)
     {
       if(website) {
       await randomRSAKeyGenerator([100,1000]).then(async(randomKey) => {
-
       Website.update({RSA_Key: randomKey}, {where:{id:websites[website].id}})})
       }
       else continue;
@@ -232,29 +220,19 @@ catch(e)
   }
 })
 }
-  catch(e)
-  {
-    //console.log(e)
-  }
+  catch(e) {}
   },
 
   async generateHashes(){
     try{
        await Website.findAll({where:{}}).then(async(websites) => {
-      for(website in websites)
+      for(let website in websites)
       {
-        if(website) {await generateHash(websites[website].URL).then(async(newHash) => {
-        
-         Website.update(
-          {
-              hash: newHash
-            },
-            {
-            where: {id:websites[website].id}
-            }
-        )
-        })}
-          else continue;
+        if(website) 
+          {await generateHash(websites[website].URL).then(async(newHash) => {
+          Website.update({ hash: newHash }, { where: { id:websites[website].id } }
+        )})}
+        else continue;
         }
       })}
     
